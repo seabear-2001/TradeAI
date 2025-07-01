@@ -10,7 +10,7 @@ from trade_agent import TradeAgent
 device = 'cuda'
 
 # 模型保存路径
-model_path = './OKX-BTC-USDT-SWAP-1s.pt'
+model_path = '/root/code/TradeAI/OKX-BTC-USDT-SWAP-1s.pt'
 
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
