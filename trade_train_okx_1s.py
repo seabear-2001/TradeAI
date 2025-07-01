@@ -59,7 +59,7 @@ def main():
     print(f"设备: {device}")
 
     # 读取预处理好的特征数据CSV
-    base_data = pd.read_csv("/mnt/data/klines/OKX-BTC-USDT-SWAP-1s.csv")
+    base_data = pd.read_csv("/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv")
     print(f"原始数据长度: {len(base_data)}")
 
     # 按比例划分训练集
