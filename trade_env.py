@@ -117,8 +117,6 @@ class TradeEnv(gymnasium.Env):
                     reward += res / self.account.initial_balance / 100
             else:
                 efficient = False
-        else:
-            efficient = False
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
         net_worth, old_net_worth = self.account.update_net_worth(current_price)
