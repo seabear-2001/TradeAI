@@ -7,6 +7,10 @@ device = 'cuda'
 
 # 模型保存路径
 model_path = '/root/code/TradeAI/OKX-BTC-USDT-SWAP-1s.pt'
+data_path = "/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv"
+
+# model_path = './OKX-BTC-USDT-SWAP-1s.pt'
+# data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
@@ -60,7 +64,7 @@ def main():
     print(f"设备: {device}")
 
     # 读取预处理好的特征数据CSV
-    base_data = pd.read_csv("/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv")
+    base_data = pd.read_csv(data_path)
     print(f"原始数据长度: {len(base_data)}")
 
     # 按比例划分训练集
@@ -78,7 +82,7 @@ def main():
         model_kwargs=model_kwargs,         # QRDQN超参数
         policy_kwargs=policy_kwargs,       # 策略网络参数
         device=device,                    # 设备
-        num_envs=12,
+        num_envs=8,
     )
 
 
