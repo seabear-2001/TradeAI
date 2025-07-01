@@ -1,9 +1,7 @@
 pandas
 numpy
-stable-baselines3[extra]
 gymnasium
 matplotlib
-ta
 shimmy
 tqdm
 rich
