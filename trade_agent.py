@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import torch
 from sb3_contrib import QRDQN
-from stable_baselines3.common.callbacks import CheckpointCallback
+from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback
 
 from trade_env import TradeEnv
 
@@ -81,14 +81,17 @@ class TradeAgent:
             model._policy_kwargs = policy_kwargs
         else:
             model.set_env(env)
-        checkpoint_callback = CheckpointCallback(
-            save_freq=1_000_000,  # 每 10 万步保存一次
-            save_path="./models/",  # 保存目录
-            name_prefix="trade_model"  # 模型文件名前缀
+        eval_callback = EvalCallback(
+            make_vec_env(df, tech_indicator_list, 1),  # 用于评估的环境（应是与训练环境相同但无扰动）
+            best_model_save_path="./best_model/",
+            log_path="./logs/eval/",
+            eval_freq=1_000_000,  # 每 100 万步评估一次
+            deterministic=True,
+            render=False
         )
         total_timesteps = len(df) * single_step_num
         try:
-            model.learn(total_timesteps=int(total_timesteps), callback=checkpoint_callback , progress_bar=True)
+            model.learn(total_timesteps=int(total_timesteps), callback=eval_callback , progress_bar=True)
         except KeyboardInterrupt:
             print("训练被手动终止，开始保存模型...")
 
