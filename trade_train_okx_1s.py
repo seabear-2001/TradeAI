@@ -7,7 +7,7 @@ from feature_engineer import all_indicator_names
 from trade_agent import TradeAgent
 
 # 设备配置：优先CPU，如有需要可改成 'cuda'
-device = 'cpu'
+device = 'cuda'
 
 # 模型保存路径
 model_path = './OKX-BTC-USDT-SWAP-1s.pt'
