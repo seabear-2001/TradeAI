@@ -78,7 +78,7 @@ def main():
         model_kwargs=model_kwargs,         # QRDQN超参数
         policy_kwargs=policy_kwargs,       # 策略网络参数
         device=device,                    # 设备
-        num_envs=8,
+        num_envs=12,
     )
 
 
