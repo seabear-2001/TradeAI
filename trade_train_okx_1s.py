@@ -19,8 +19,8 @@ if system_name == "Windows":
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
 num_envs = 8
-# 每步训练的重复次数（乘以数据条数作为总训练步数）
-single_step_num = 8
+
+single_step_num = 8 # 每步训练的重复次数
 
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
 model_kwargs = {
