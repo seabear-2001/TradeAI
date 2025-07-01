@@ -81,7 +81,7 @@ class TradeAgent:
             model.set_env(env)
 
         total_timesteps = len(df) * single_step_num * num_envs  # 乘以环境数，保持训练量
-        model.learn(total_timesteps=total_timesteps, progress_bar=True)
+        model.learn(total_timesteps=int(total_timesteps), progress_bar=True)
 
         last_ts = int(df['timestamp'].max().timestamp())
         self.save_model(path, model, last_ts)
