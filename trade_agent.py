@@ -12,14 +12,16 @@ class TradeAgent:
 
     @staticmethod
     def get_model(model_kwargs=None, policy_kwargs=None, env=None, device="cpu"):
+        model_kwargs = model_kwargs or {}
+        if policy_kwargs:
+            model_kwargs['policy_kwargs'] = policy_kwargs
+        model_kwargs['device'] = device
+        model_kwargs['verbose'] = 1
+
         return QRDQN(
             "MlpPolicy",
             env,
-            verbose=1,
-            gradient_steps=  1,
-            device=device,
-            **(model_kwargs or {}),
-            policy_kwargs=policy_kwargs,
+            **model_kwargs
         )
 
     @staticmethod
