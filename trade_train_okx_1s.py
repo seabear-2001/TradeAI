@@ -28,8 +28,7 @@ model_kwargs = {
     "buffer_size": 2_000_000,           # 经验回放池大小，越大越稳定但占内存
     "learning_starts": 10_000,        # 收集多少步后开始训练
     "batch_size": 256,                # 每次训练采样大小
-    "train_freq": 2,                  # 每执行多少步训练一次模型
-    # "gradient_steps ": 2,             # 每次训练的更新步数
+    "train_freq": 2,                  # 每执行多少步训练一次模型 和 每次训练的更新步数
     "target_update_interval": 1000,   # 目标网络更新频率
     "exploration_fraction": 0.2,      # epsilon衰减比例，前20%训练是探索
     "exploration_final_eps": 0.02,    # epsilon最终最小值
