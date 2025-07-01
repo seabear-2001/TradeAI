@@ -14,7 +14,7 @@ data_path = "/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv"
 
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
-num_envs = 8
+num_envs = 12
 # 每步训练的重复次数（乘以数据条数作为总训练步数）
 single_step_num = 8
 
