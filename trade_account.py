@@ -73,9 +73,6 @@ class TradeAccount:
         """指定档位平多仓"""
         if amount <= 1e-8 or not (0 <= slot_idx < self.slots):
             return False
-        old_amount = self.long_positions[slot_idx]
-        if old_amount < amount:
-            return False
 
         fee = amount * current_price * self.fee_rate
         profit = (current_price - self.long_avg_prices[slot_idx]) * amount
@@ -133,9 +130,6 @@ class TradeAccount:
     def close_short(self, slot_idx, current_price, amount):
         """指定档位平空仓"""
         if amount <= 1e-8 or not (0 <= slot_idx < self.slots):
-            return False
-        old_amount = self.short_positions[slot_idx]
-        if old_amount < amount:
             return False
 
         fee = amount * current_price * self.fee_rate
