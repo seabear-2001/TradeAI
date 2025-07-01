@@ -21,7 +21,7 @@ class TradeAgent:
         return QRDQN(
             "MlpPolicy",
             env,
-            gradient_steps = 3,
+            gradient_steps = 2,
             **model_kwargs
         )
 
