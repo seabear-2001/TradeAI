@@ -34,7 +34,27 @@ policy_kwargs = dict(
     activation_fn=torch.nn.ReLU       # 激活函数ReLU
 )
 
-
+all_indicator_names = [
+    "macd",
+    "boll_ub",
+    "boll_lb",
+    "rsi_30",
+    "cci_30",
+    "dx_30",
+    "close_30_sma",
+    "close_60_sma",
+    "ema_12",
+    "ema_26",
+    "momentum_10",
+    "roc_10",
+    "willr_14",
+    "stoch_k_14",
+    "stoch_d_14",
+    "atr_14",
+    "trange",
+    "obv",
+    "vwap"
+]
 def main():
     print(f"设备: {device}")
 
