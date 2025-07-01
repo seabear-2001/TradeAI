@@ -16,6 +16,7 @@ class TradeAgent:
             "MlpPolicy",
             env,
             verbose=1,
+            gradient_steps=  1,
             device=device,
             **(model_kwargs or {}),
             policy_kwargs=policy_kwargs,
@@ -70,7 +71,6 @@ class TradeAgent:
         env = make_vec_env(df, tech_indicator_list, num_envs)
         print(f"✅ {num_envs}环境并行构建完成")
 
-        model, _ = self.load_model(path, env, model_kwargs, policy_kwargs, device)
         if model is None:
             model = self.get_model(model_kwargs, policy_kwargs, env, device)
             model._model_kwargs = model_kwargs
