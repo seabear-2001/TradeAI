@@ -126,7 +126,7 @@ class TradeEnv(gymnasium.Env):
         reward -= self.account.get_drawdown()
 
         if not efficient:
-            reward -= 0.01
+            reward -= 0.001
 
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
