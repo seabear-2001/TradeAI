@@ -54,46 +54,20 @@ class TradeAgent:
         self,
         path,
         df,
-        min_data_len=1000,
+        model = None,
         single_step_num=3,
         num_envs=1,
         tech_indicator_list=None,
         model_kwargs=None,
         policy_kwargs=None,
-        autoFeature=False,
         device="cpu",
     ):
         df = df.copy()
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         check_timestamp_consistency(df)
 
-        if os.path.exists(path):
-            model_data = torch.load(path, map_location=device)
-            old_model_kwargs = model_data.get("model_kwargs")
-            old_policy_kwargs = model_data.get("policy_kwargs")
-            last_train_ts = model_data.get("last_train_ts", 0)
-        else:
-            model_data = None
-            old_model_kwargs = None
-            old_policy_kwargs = None
-            last_train_ts = 0
 
-        full_train = not self._params_equal(model_kwargs, old_model_kwargs) or not self._params_equal(policy_kwargs, old_policy_kwargs)
-        if full_train:
-            data_to_train = df
-            print(f"[模型 {path}] 超参数变化，执行全量训练（共 {len(data_to_train)} 条）")
-        else:
-            data_to_train = df[df['timestamp'].apply(lambda x: int(x.timestamp())) > last_train_ts]
-            print(f"[模型 {path}] 增量训练（新增 {len(data_to_train)} 条）")
-            if len(data_to_train) < min_data_len:
-                print(f"[模型 {path}] 数据不足，跳过训练")
-                return
-
-        if autoFeature:
-            print("🔧 特征工程中...")
-            data_to_train = FeatureEngineer(tech_indicator_list).preprocess_data(data_to_train)
-
-        env = make_vec_env(data_to_train, tech_indicator_list, num_envs)
+        env = make_vec_env(df, tech_indicator_list, num_envs)
         print(f"✅ {num_envs}环境并行构建完成")
 
         model, _ = self.load_model(path, env, model_kwargs, policy_kwargs, device)
@@ -104,10 +78,10 @@ class TradeAgent:
         else:
             model.set_env(env)
 
-        total_timesteps = len(data_to_train) * single_step_num * num_envs  # 乘以环境数，保持训练量
+        total_timesteps = len(df) * single_step_num * num_envs  # 乘以环境数，保持训练量
         model.learn(total_timesteps=total_timesteps, progress_bar=True)
 
-        last_ts = int(data_to_train['timestamp'].max().timestamp())
+        last_ts = int(df['timestamp'].max().timestamp())
         self.save_model(path, model, last_ts)
         print(f"[模型 {path}] 训练完成，最后时间戳更新为 {last_ts}")
 

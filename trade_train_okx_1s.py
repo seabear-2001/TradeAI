@@ -16,10 +16,10 @@ single_step_num = 4
 
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
 model_kwargs = {
-    "learning_rate": 1e-4,            # 学习率，越小越稳定
+    "learning_rate": 5e-5,            # 学习率，越小越稳定
     "buffer_size": 1_000_000,           # 经验回放池大小，越大越稳定但占内存
     "learning_starts": 10_000,        # 收集多少步后开始训练
-    "batch_size": 512,                # 每次训练采样大小
+    "batch_size": 256,                # 每次训练采样大小
     "train_freq": 1,                  # 每执行多少步训练一次模型
     "gradient_steps ": 2,             # 每次训练的更新步数
     "target_update_interval": 1000,   # 目标网络更新频率
@@ -74,8 +74,6 @@ def main():
         path=model_path,                    # 模型保存路径
         df=train_df,                       # 训练数据DataFrame
         tech_indicator_list=all_indicator_names,  # 技术指标列表
-        autoFeature=False,                 # 不自动做特征工程，已做过
-        min_data_len=1000,                 # 最小训练数据长度限制
         single_step_num=single_step_num,  # 每条数据训练多少步
         model_kwargs=model_kwargs,         # QRDQN超参数
         policy_kwargs=policy_kwargs,       # 策略网络参数
