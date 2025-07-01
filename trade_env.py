@@ -157,31 +157,3 @@ class TradeEnv(gymnasium.Env):
               f"净值: {self.account.net_worth:.2f}")
 
 
-def check_future_outcome(data_array, current_step, entry_price, direction):
-    """
-    判断在未来行情中，是否先止盈或止损，或最终是盈利还是亏损
-    direction: "long" 或 "short"
-    """
-    tp_rate = 1.005  # 止盈0.5%
-    sl_rate = 0.997  # 止损0.3%
-    future_data = data_array[current_step + 1:]
-    outcome = "no_target"
-
-    for step_data in future_data:
-        high = step_data[1]
-        low = step_data[2]
-        if direction == "long":
-            if high >= entry_price * tp_rate:
-                outcome = "盈利"
-                break
-            if low <= entry_price * sl_rate:
-                outcome = "亏损"
-                break
-        elif direction == "short":
-            if low <= entry_price * (2 - tp_rate):  # 等价于 *0.95
-                outcome = "盈利"
-                break
-            if high >= entry_price * (2 - sl_rate):  # 等价于 *1.03
-                outcome = "亏损"
-                break
-    return outcome
