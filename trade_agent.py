@@ -81,7 +81,7 @@ class TradeAgent:
         else:
             model.set_env(env)
 
-        total_timesteps = len(df) * single_step_num / num_envs
+        total_timesteps = len(df) * single_step_num
         try:
             model.learn(total_timesteps=int(total_timesteps), progress_bar=True)
         except KeyboardInterrupt:
