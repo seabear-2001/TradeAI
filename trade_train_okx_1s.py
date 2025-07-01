@@ -15,6 +15,9 @@ model_path = '/mnt/data/klines/OKX-BTC-USDT-SWAP-1s.pt'
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
 
+# 每步训练的重复次数（乘以数据条数作为总训练步数）
+single_step_num = 3
+
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
 model_kwargs = {
     "learning_rate": 1e-4,            # 学习率，越小越稳定
@@ -56,6 +59,7 @@ def main():
         tech_indicator_list=all_indicator_names,  # 技术指标列表
         autoFeature=False,                 # 不自动做特征工程，已做过
         min_data_len=1000,                 # 最小训练数据长度限制
+        single_step_num=single_step_num,  # 每条数据训练多少步
         model_kwargs=model_kwargs,         # QRDQN超参数
         policy_kwargs=policy_kwargs,       # 策略网络参数
         device=device,                    # 设备

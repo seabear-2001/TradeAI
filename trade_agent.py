@@ -56,6 +56,7 @@ class TradeAgent:
         path,
         df,
         min_data_len=1000,
+        single_step_num=3,
         num_envs=1,
         tech_indicator_list=None,
         model_kwargs=None,
@@ -104,7 +105,7 @@ class TradeAgent:
         else:
             model.set_env(env)
 
-        total_timesteps = len(data_to_train) * num_envs  # 乘以环境数，保持训练量
+        total_timesteps = len(data_to_train) * single_step_num * num_envs  # 乘以环境数，保持训练量
         model.learn(total_timesteps=total_timesteps, progress_bar=True)
 
         last_ts = int(data_to_train['timestamp'].max().timestamp())
