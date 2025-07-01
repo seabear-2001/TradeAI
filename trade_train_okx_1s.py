@@ -1,20 +1,24 @@
+import platform
+
 import pandas as pd
 import torch
 from trade_agent import TradeAgent
 
-# 设备配置：优先CPU，如有需要可改成 'cuda'
-device = 'cuda'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 # 模型保存路径
 model_path = '/root/code/TradeAI/OKX-BTC-USDT-SWAP-1s.pt'
 data_path = "/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv"
+system_name = platform.system()
+if system_name == "Windows":
+    model_path = './OKX-BTC-USDT-SWAP-1s.pt'
+    data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
-# model_path = './OKX-BTC-USDT-SWAP-1s.pt'
-# data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
-num_envs = 12
+num_envs = 8
 # 每步训练的重复次数（乘以数据条数作为总训练步数）
 single_step_num = 8
 
