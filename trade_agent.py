@@ -21,7 +21,7 @@ class TradeAgent:
         return QRDQN(
             "MlpPolicy",
             env,
-            gradient_steps = 2,
+            gradient_steps = model_kwargs["train_freq"],
             **model_kwargs
         )
 
