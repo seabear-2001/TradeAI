@@ -18,11 +18,13 @@ class TradeAgent:
             model_kwargs['policy_kwargs'] = policy_kwargs
         model_kwargs['device'] = device
         model_kwargs['verbose'] = 1
+        gradient_steps = model_kwargs["gradient_steps"]
+        model_kwargs.pop("gradient_steps")
 
         return QRDQN(
             "MlpPolicy",
             env,
-            gradient_steps = model_kwargs["train_freq"],
+            gradient_steps = gradient_steps,
             **model_kwargs
         )
 
@@ -41,7 +43,7 @@ class TradeAgent:
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None, None
-        model_data = torch.load(path, map_location=device)
+        model_data = torch.load(path, map_location=device, weights_only= True)
 
         if model_kwargs is None:
             model_kwargs = model_data.get('model_kwargs', model_kwargs)
