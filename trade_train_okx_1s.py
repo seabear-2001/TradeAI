@@ -38,7 +38,7 @@ model_kwargs = {
 
 # 策略网络结构及激活函数
 policy_kwargs = dict(
-    net_arch=[256, 128],              # 两层全连接网络，256和128神经元
+    net_arch=[256, 256],              # 两层全连接网络，256和128神经元
     activation_fn=torch.nn.ReLU       # 激活函数ReLU
 )
 
