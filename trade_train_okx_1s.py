@@ -34,7 +34,6 @@ model_kwargs = {
     "exploration_fraction": 0.2,      # epsilon衰减比例，前20%训练是探索
     "exploration_final_eps": 0.02,    # epsilon最终最小值
     "gamma": 0.99,                   # 折扣因子，考虑未来奖励的权重
-    # "n_quantiles": 25,               # QRDQN专用参数，分位数个数
 }
 
 # 策略网络结构及激活函数
