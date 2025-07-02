@@ -43,7 +43,7 @@ class TradeAgent:
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None, None
-        model_data = torch.load(path, map_location=device, weights_only= True)
+        model_data = torch.load(path, map_location=device, weights_only= False)
 
         if model_kwargs is None:
             model_kwargs = model_data.get('model_kwargs', model_kwargs)
