@@ -8,7 +8,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 # 模型保存路径
-model_path = '/root/code/TradeAI/OKX-BTC-USDT-SWAP-1s.pt'
+model_path = './OKX-BTC-USDT-SWAP-1s.pt'
 data_path = "/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
