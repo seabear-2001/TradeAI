@@ -6,3 +6,4 @@ shimmy
 tqdm
 rich
 sb3-contrib
+stable-baselines3
