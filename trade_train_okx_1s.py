@@ -20,11 +20,11 @@ if system_name == "Windows":
 TRAIN_RATIO = 0.8
 num_envs = 8
 
-single_step_num = 4 # 每步训练的重复次数
+single_step_num = 1 # 每步训练的重复次数
 
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
 model_kwargs = {
-    "learning_rate": 1e-4,            # 学习率，越小越稳定
+    "learning_rate": 1e-5,            # 学习率，越小越稳定
     "buffer_size": 30_000_000,           # 经验回放池大小，越大越稳定但占内存
     "learning_starts": 10_000,        # 收集多少步后开始训练
     "batch_size": 1024,                # 每次训练采样大小
