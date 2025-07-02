@@ -18,7 +18,7 @@ if system_name == "Windows":
 
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
-num_envs = 1
+num_envs = 8
 
 single_step_num = 4 # 每步训练的重复次数
 
