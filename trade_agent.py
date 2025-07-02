@@ -18,13 +18,13 @@ class TradeAgent:
             model_kwargs['policy_kwargs'] = policy_kwargs
         model_kwargs['device'] = device
         model_kwargs['verbose'] = 1
-        gradient_steps = model_kwargs["gradient_steps"]
+        gradient_steps = model_kwargs["gradient_steps"] if model_kwargs["gradient_steps"] is None else 1
         model_kwargs.pop("gradient_steps")
 
         return QRDQN(
             "MlpPolicy",
             env,
-            gradient_steps = gradient_steps if gradient_steps is None else 1,
+            gradient_steps = gradient_steps,
             **model_kwargs
         )
 
