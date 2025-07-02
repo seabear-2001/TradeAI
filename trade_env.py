@@ -99,7 +99,7 @@ class TradeEnv(gymnasium.Env):
                 if res is False:
                     efficient = False
                 else:
-                    reward += res / self.account.initial_balance / 1000
+                    reward += 0.01
             else:
                 efficient = False
         elif 11 <= action <= 15:  # 开空档位
@@ -114,16 +114,14 @@ class TradeEnv(gymnasium.Env):
                 if res is False:
                     efficient = False
                 else:
-                    reward += res / self.account.initial_balance / 1000
+                    reward += 0.01
             else:
                 efficient = False
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
         net_worth, old_net_worth = self.account.update_net_worth(current_price)
-        net_worth_change = (net_worth - old_net_worth) / self.account.initial_balance
-        reward += net_worth_change / self.account.initial_balance
-        reward += self.account.get_gain_ratio()
-        reward -= self.account.get_drawdown()
+        reward += (net_worth - old_net_worth) / self.account.initial_balance * 10 # 本步收益
+        reward -= self.account.get_drawdown() * 2 # 本步回撤
 
         if not efficient:
             reward -= 0.001
@@ -147,6 +145,7 @@ class TradeEnv(gymnasium.Env):
             'reward': reward
         }
 
+        # print(reward)
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info
 
