@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import torch
+from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import EvalCallback
 
 from trade_env import TradeEnv
