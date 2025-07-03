@@ -115,7 +115,7 @@ class TradeEnv(gymnasium.Env):
         dd_delta = drawdown - prev_drawdown
         if dd_delta > 0:
             reward -= dd_delta * 100
-        if gain_ratio < 0.01:
+        if gain_ratio < 0.02:
             reward -= gain_ratio
 
         reward *= 10
