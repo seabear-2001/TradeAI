@@ -118,7 +118,7 @@ class TradeEnv(gymnasium.Env):
         if gain_ratio < 0.02:
             reward -= gain_ratio
 
-        reward *= 10
+        reward *= 50
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
