@@ -74,6 +74,8 @@ class TradeAccount:
         amount = max_position_amount
         fee = amount * current_price * self.fee_rate * 0 # 取消开仓手续费
         cost = amount * current_price / self.leverage + fee
+        if self.short_position > 0:
+            return False
         if self.balance >= cost and amount > 0:
             total_cost = self.short_position * self.short_ave_price + amount * current_price
             self.short_position += amount
