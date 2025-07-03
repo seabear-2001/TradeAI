@@ -95,7 +95,7 @@ class TradeEnv(gymnasium.Env):
             account_order_res = self.account.close_short(current_price)
 
         if account_order_res is False:
-            reward -= 0.01
+            reward -= 0.001
 
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
@@ -106,17 +106,19 @@ class TradeEnv(gymnasium.Env):
         # 假设你之前保存了 last_max_net_worth（上一步的 max），用于计算新增回撤
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
-        # 1. 本步收益奖励
-        if net_worth > old_net_worth:
+        reward = 0
+
+        # ✅ 本步收益（只在净值上涨时给予）
+        if net_worth > old_net_worth and gain_ratio > 0:
             reward += (net_worth - old_net_worth) / self.account.initial_balance * 100
 
-        # 2. 本步新增回撤惩罚（只惩罚 max_net_worth - net_worth 的“增长部分”）
-        if max_net_worth > net_worth and max_net_worth > old_net_worth:
-            drawdown_prev = (max_net_worth - old_net_worth) / max_net_worth
-            drawdown_now = (max_net_worth - net_worth) / max_net_worth
-            dd_increase = drawdown_now - drawdown_prev
-            if dd_increase > 0:
-                reward -= dd_increase * 100
+        # ✅ 回撤惩罚（只惩罚新增回撤）
+        drawdown = (max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0
+        prev_drawdown = (max_net_worth - old_net_worth) / max_net_worth if max_net_worth > 0 else 0
+        dd_delta = drawdown - prev_drawdown
+        if dd_delta > 0:
+            reward -= dd_delta * 100
+
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
@@ -129,7 +131,7 @@ class TradeEnv(gymnasium.Env):
             'reward': reward
         }
         self.last_print_step = 0
-        if self.current_step - self.last_print_step >= 10000 or terminated:
+        if terminated:
             print(info)
             self.last_print_step = self.current_step
 
