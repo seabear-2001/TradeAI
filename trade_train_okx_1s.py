@@ -8,9 +8,9 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 # 模型保存路径
-eval_path = '/mnt/data/'
-model_path = '/mnt/data/OKX-BTC-USDT-SWAP-1s.pt'
-data_path = "/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv"
+eval_path = '/root/autodl-fs'
+model_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.pt'
+data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
     eval_path = './'
