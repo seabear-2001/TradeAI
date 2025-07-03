@@ -118,10 +118,12 @@ class TradeEnv(gymnasium.Env):
             'ratio': self.account.get_gain_ratio(),
             'reward': reward
         }
+
         if terminated:
             self.terminated_count += 1
-        if self.terminated_count % 4 == 0:
-            print(info)
+            if self.terminated_count % 4 == 0:
+                print(info)
+
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info
 
