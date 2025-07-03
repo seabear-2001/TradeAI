@@ -97,16 +97,14 @@ class TradeEnv(gymnasium.Env):
         if account_order_res is False:
             reward -= 0.01
 
+        # 假设你之前保存了 last_max_net_worth（上一步的 max），用于计算新增回撤
+        net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
+
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
             terminated = True
         elif gain_ratio <= -self.account_stop_loss_ratio:
             terminated = True
-
-        # 假设你之前保存了 last_max_net_worth（上一步的 max），用于计算新增回撤
-        net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
-
-        reward = 0
 
         # ✅ 本步收益（只在净值上涨时给予）
         if net_worth > old_net_worth and gain_ratio > 0:
