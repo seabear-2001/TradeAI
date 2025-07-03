@@ -89,7 +89,9 @@ class TradeEnv(gymnasium.Env):
                 reward -= 0.01
         elif 1 <= action <= 5:  # 开多档位
             idx = action - 1
-            if not self.account.open_long(idx, current_price, base_amount):
+            if self.account.open_long(idx, current_price, base_amount):
+                reward += 0.001
+            else:
                 efficient = False
         elif 6 <= action <= 10:  # 平多档位
             idx = action - 6
@@ -104,7 +106,9 @@ class TradeEnv(gymnasium.Env):
                 efficient = False
         elif 11 <= action <= 15:  # 开空档位
             idx = action - 11
-            if not self.account.open_short(idx, current_price, base_amount):
+            if self.account.open_short(idx, current_price, base_amount):
+                reward += 0.001
+            else:
                 efficient = False
         elif 16 <= action <= 20:  # 平空档位
             idx = action - 16
