@@ -116,8 +116,8 @@ class TradeEnv(gymnasium.Env):
             'ratio': self.account.get_gain_ratio(),
             'reward': reward
         }
-
-        # print(reward)
+        if terminated:
+            print(info)
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info
 
