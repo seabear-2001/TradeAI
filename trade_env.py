@@ -96,9 +96,9 @@ class TradeEnv(gymnasium.Env):
             account_order_res = self.account.close_short(current_price)
 
         if account_order_res is False:
-            reward -= 0.01
+            reward -= 0.1
         elif account_order_res is True:
-            reward += 0.01
+            reward += 0.1
 
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
@@ -111,7 +111,7 @@ class TradeEnv(gymnasium.Env):
         # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
         if net_worth > old_net_worth and net_worth > self.account.initial_balance:
             reward += (min((net_worth - old_net_worth), (net_worth - self.account.initial_balance))
-                       / self.account.initial_balance * 10000)
+                       / self.account.initial_balance * 100)
 
         # # ✅ 净值奖励
         # if net_worth > old_net_worth:
