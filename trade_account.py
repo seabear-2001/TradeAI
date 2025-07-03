@@ -37,7 +37,7 @@ class TradeAccount:
         self.short_ave_price = 0.0
 
     def open_long(self, current_price):
-        if self.long_position < 0:
+        if self.long_position > 0:
             return False
         """按指定数量开多头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
@@ -69,7 +69,7 @@ class TradeAccount:
         return True
 
     def open_short(self, current_price):
-        if self.short_position < 0:
+        if self.short_position > 0:
             return False
         """按指定数量开空头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
