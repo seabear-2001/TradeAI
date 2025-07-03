@@ -83,7 +83,7 @@ class TradeEnv(gymnasium.Env):
         account_order_res = None
 
         if action == 0:
-            if np.sum(self.account.long_position) <= 0 and np.sum(self.account.short_position) <= 0:
+            if self.account.long_position <= 0 and self.account.short_position <= 0:
                 account_order_res = False
         elif action == 1:  # 开多档位
             account_order_res = self.account.open_long(current_price)
@@ -106,7 +106,7 @@ class TradeEnv(gymnasium.Env):
             terminated = True
 
         # ✅ 本步收益（只在净值上涨时给予）
-        if net_worth > old_net_worth and gain_ratio > 0:
+        if net_worth > old_net_worth and net_worth > self.account.initial_balance:
             reward += (net_worth - old_net_worth) / self.account.initial_balance * 100
 
         # ✅ 回撤惩罚（只惩罚新增回撤）
