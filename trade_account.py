@@ -8,7 +8,7 @@ class TradeAccount:
             self,
             initial_balance=1000000,         # 初始账户资金
             leverage=100,                    # 杠杆倍数，用于计算保证金
-            fee_rate=0.0000,                  # 交易手续费率
+            fee_rate=0.0005,                  # 交易手续费率
             max_position_ratio= 0.2
     ):
         # 账户参数
