@@ -63,7 +63,7 @@ class TradeAgent:
         path,
         df,
         eval_path = ".",
-         eval_freq = 1_000_000,
+        eval_freq = 1_000_000,
         model = None,
         single_step_num=3,
         num_envs=1,
