@@ -15,7 +15,6 @@ class TradeEnv(gymnasium.Env):
             df=None,                            # 训练数据，DataFrame 格式
             tech_indicator_list=None,           # 技术指标列名列表
             account=None,                       # 交易账户实例
-            max_position_ratio=0.2,             # 单向最大持仓量占初始本金比例
             account_stop_loss_ratio=0.1,        # 账户整体止损比例
             account_take_profit_ratio=0.2,      # 账户整体止盈比例
     ):
@@ -23,7 +22,6 @@ class TradeEnv(gymnasium.Env):
 
         # 参数记录
         self.live_mode = live_mode
-        self.max_position_ratio = max_position_ratio
         self.account_stop_loss_ratio = account_stop_loss_ratio
         self.account_take_profit_ratio = account_take_profit_ratio
 
@@ -37,7 +35,7 @@ class TradeEnv(gymnasium.Env):
         else:
             self.data_array = np.empty((0, len(self.df_fields)), dtype=np.float32)
 
-        self.action_space = spaces.Discrete(21)  # 0~20
+        self.action_space = spaces.Discrete(5)  # 0~4
 
 
         # 状态空间：行情数据 + 账户状态（余额、多空仓位）
@@ -77,52 +75,24 @@ class TradeEnv(gymnasium.Env):
 
     def step(self, action):
         current_price = self.data_array[self.current_step][3]
-        max_position_amount = self.account.initial_balance / current_price * self.max_position_ratio
-        base_amount = max_position_amount * self.account.leverage / self.account.slots  # 每档大小
 
         reward = 0.0
-        efficient = True
         terminated = False
+        account_order_res = None
 
         if action == 0:
-            if np.sum(self.account.long_positions) <= 0 and np.sum(self.account.short_positions) <= 0:
-                reward -= 0.01
-        elif 1 <= action <= 5:  # 开多档位
-            idx = action - 1
-            if self.account.open_long(idx, current_price, base_amount):
-                reward += 0.001
-            else:
-                efficient = False
-        elif 6 <= action <= 10:  # 平多档位
-            idx = action - 6
-            amount = self.account.long_positions[idx]
-            if amount > 0:
-                res = self.account.close_long(idx, current_price, amount)
-                if res is False:
-                    efficient = False
-                else:
-                    reward += 0.001
-            else:
-                efficient = False
-        elif 11 <= action <= 15:  # 开空档位
-            idx = action - 11
-            if self.account.open_short(idx, current_price, base_amount):
-                reward += 0.001
-            else:
-                efficient = False
-        elif 16 <= action <= 20:  # 平空档位
-            idx = action - 16
-            amount = self.account.short_positions[idx]
-            if amount > 0:
-                res = self.account.close_short(idx, current_price, amount)
-                if res is False:
-                    efficient = False
-                else:
-                    reward += 0.001
-            else:
-                efficient = False
+            if np.sum(self.account.long_position) <= 0 and np.sum(self.account.short_position) <= 0:
+                account_order_res = False
+        elif action == 1:  # 开多档位
+            account_order_res = self.account.open_long(current_price)
+        elif action == 2:  # 平多档位
+            account_order_res = self.account.close_long(current_price)
+        elif action == 3:  # 开空档位
+            account_order_res = self.account.open_short(current_price)
+        elif action == 4:  # 平空档位
+            account_order_res = self.account.close_short(current_price)
 
-        if not efficient:
+        if account_order_res is False:
             reward -= 0.001
 
         gain_ratio = self.account.get_gain_ratio()

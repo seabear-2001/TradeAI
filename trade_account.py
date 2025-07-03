@@ -1,188 +1,126 @@
 import numpy as np
 
-class TradeAccount:
-    """支持多档拆分持仓的交易账户"""
 
+class TradeAccount:
     def __init__(
             self,
             initial_balance=1000000,
             leverage=100,
             fee_rate=0.0005,
-            slots=5  # 拆分仓位档位数量，默认5档
+            max_position_ratio=0.2
     ):
         self.initial_balance = initial_balance
         self.leverage = leverage
         self.fee_rate = fee_rate
-        self.slots = slots
-
-        self.balance = initial_balance
-        self.net_worth = initial_balance
-        self.max_net_worth = initial_balance
-
-        # 多头和空头仓位数组，存每档仓位数量和均价
-        self.long_positions = np.zeros(slots, dtype=np.float64)
-        self.long_avg_prices = np.zeros(slots, dtype=np.float64)
-        self.short_positions = np.zeros(slots, dtype=np.float64)
-        self.short_avg_prices = np.zeros(slots, dtype=np.float64)
-
-        self.trades = []
-        self.loss_trade_count = 0
-        self.consecutive_loss_count = 0
+        self.max_position_ratio = max_position_ratio
+        self.reset()
 
     def reset(self):
         self.balance = self.initial_balance
         self.net_worth = self.initial_balance
         self.max_net_worth = self.initial_balance
-        self.long_positions.fill(0)
-        self.long_avg_prices.fill(0)
-        self.short_positions.fill(0)
-        self.short_avg_prices.fill(0)
-        self.trades = []
-        self.loss_trade_count = 0
-        self.consecutive_loss_count = 0
+        self.long_position = 0.0
+        self.long_ave_price = 0.0
+        self.short_position = 0.0
+        self.short_ave_price = 0.0
 
-    def open_long(self, slot_idx, current_price, amount):
-        """指定档位开多仓"""
-        if amount <= 1e-8 or not (0 <= slot_idx < self.slots):
-            return False
-        fee = amount * current_price * self.fee_rate
-        cost = amount * current_price + fee
-        if self.balance * self.leverage < cost:
-            return False
+    def open_long(self, current_price):
+        """开多头仓位（动态仓位控制）"""
+        # 动态计算最大仓位
+        max_amount = (self.net_worth * self.max_position_ratio) / current_price
+        amount = max_amount
 
-        if slot_idx in self.long_positions and self.long_positions[slot_idx] > 1e-8:
-            return False
+        # 计算实际需要资金
+        trade_value = amount * current_price
+        fee = trade_value * self.fee_rate
+        margin_required = trade_value / self.leverage
+        total_cost = margin_required + fee
 
-        old_amount = self.long_positions[slot_idx]
-        old_avg = self.long_avg_prices[slot_idx]
+        # 检查开仓条件
+        if (
+                self.balance >= total_cost
+                and amount > 0
+                and self.short_position == 0  # 无空头持仓
+        ):
+            # 更新持仓
+            if self.long_position == 0:
+                self.long_ave_price = current_price
+            else:
+                total_cost = self.long_position * self.long_ave_price + amount * current_price
+                total_amount = self.long_position + amount
+                self.long_ave_price = total_cost / total_amount
 
-        total_cost = old_amount * old_avg + amount * current_price
-        new_amount = old_amount + amount
-        new_avg = total_cost / new_amount
+            self.long_position += amount
+            self.balance -= total_cost
+            return fee
+        return False
 
-        self.long_positions[slot_idx] = new_amount
-        self.long_avg_prices[slot_idx] = new_avg
-        self.balance -= cost / self.leverage
-
-        self.trades.append({
-            'type': 'open_long',
-            'slot': slot_idx,
-            'amount': amount,
-            'price': current_price
-        })
-        return True
-
-    def close_long(self, slot_idx, current_price, amount):
-        """指定档位平多仓"""
-        if amount <= 1e-8 or not (0 <= slot_idx < self.slots):
+    def close_long(self, current_price):
+        if self.long_position == 0:
             return False
 
-        fee = amount * current_price * self.fee_rate
-        profit = (current_price - self.long_avg_prices[slot_idx]) * amount
-        margin = self.long_avg_prices[slot_idx] * amount / self.leverage
+        # 计算盈亏
+        trade_value = self.long_position * current_price
+        fee = trade_value * self.fee_rate
+        profit = (current_price - self.long_ave_price) * self.long_position
+        released_margin = (self.long_position * self.long_ave_price) / self.leverage
 
-        self.balance += margin + profit - fee
-        self.long_positions[slot_idx] -= amount
-        if self.long_positions[slot_idx] < 1e-8:
-            self.long_positions[slot_idx] = 0.0
-            self.long_avg_prices[slot_idx] = 0.0
-
-        self.trades.append({
-            'type': 'close_long',
-            'slot': slot_idx,
-            'amount': amount,
-            'price': current_price
-        })
-
-        if profit < 0:
-            self.loss_trade_count += 1
-            self.consecutive_loss_count += 1
-        else:
-            self.consecutive_loss_count = 0
-
+        # 更新账户
+        self.balance += released_margin + profit - fee
+        self.long_position = 0.0
+        self.long_ave_price = 0.0  # 重置均价
         return profit
 
-    def open_short(self, slot_idx, current_price, amount):
-        """指定档位开空仓"""
-        if amount <= 1e-8 or not (0 <= slot_idx < self.slots):
-            return False
-        fee = amount * current_price * self.fee_rate
-        cost = fee
-        if self.balance * self.leverage < cost:
-            return False
+    def open_short(self, current_price):
+        """开空头仓位（逻辑同开多）"""
+        max_amount = (self.net_worth * self.max_position_ratio) / current_price
+        amount = max_amount
 
-        if slot_idx in self.short_positions and self.short_positions[slot_idx] > 1e-8:
-            return False
+        trade_value = amount * current_price
+        fee = trade_value * self.fee_rate
+        margin_required = trade_value / self.leverage
+        total_cost = margin_required + fee
 
-        old_amount = self.short_positions[slot_idx]
-        old_avg = self.short_avg_prices[slot_idx]
+        if (
+                self.balance >= total_cost
+                and amount > 0
+                and self.long_position == 0  # 无多头持仓
+        ):
+            if self.short_position == 0:
+                self.short_ave_price = current_price
+            else:
+                total_cost = self.short_position * self.short_ave_price + amount * current_price
+                total_amount = self.short_position + amount
+                self.short_ave_price = total_cost / total_amount
 
-        total_cost = old_amount * old_avg + amount * current_price
-        new_amount = old_amount + amount
-        new_avg = total_cost / new_amount
+            self.short_position += amount
+            self.balance -= total_cost
+            return fee
+        return False
 
-        self.short_positions[slot_idx] = new_amount
-        self.short_avg_prices[slot_idx] = new_avg
-        self.balance -= cost / self.leverage
-
-        self.trades.append({
-            'type': 'open_short',
-            'slot': slot_idx,
-            'amount': amount,
-            'price': current_price
-        })
-        return True
-
-    def close_short(self, slot_idx, current_price, amount):
-        """指定档位平空仓"""
-        if amount <= 1e-8 or not (0 <= slot_idx < self.slots):
+    def close_short(self, current_price):
+        if self.short_position == 0:
             return False
 
-        fee = amount * current_price * self.fee_rate
-        profit = (self.short_avg_prices[slot_idx] - current_price) * amount
-        margin = self.short_avg_prices[slot_idx] * amount / self.leverage
+        trade_value = self.short_position * current_price
+        fee = trade_value * self.fee_rate
+        profit = (self.short_ave_price - current_price) * self.short_position
+        released_margin = (self.short_position * self.short_ave_price) / self.leverage
 
-        self.balance += margin + profit - fee
-        self.short_positions[slot_idx] -= amount
-        if self.short_positions[slot_idx] < 1e-8:
-            self.short_positions[slot_idx] = 0.0
-            self.short_avg_prices[slot_idx] = 0.0
-
-        self.trades.append({
-            'type': 'close_short',
-            'slot': slot_idx,
-            'amount': amount,
-            'price': current_price
-        })
-
-        if profit < 0:
-            self.loss_trade_count += 1
-            self.consecutive_loss_count += 1
-        else:
-            self.consecutive_loss_count = 0
-
+        self.balance += released_margin + profit - fee
+        self.short_position = 0.0
+        self.short_ave_price = 0.0  # 重置均价
         return profit
 
     def update_net_worth(self, current_price):
         old_net_worth = self.net_worth
-        long_val = np.sum(self.long_positions * (current_price - self.long_avg_prices))
-        short_val = np.sum(self.short_positions * (self.short_avg_prices - current_price))
-        self.net_worth = self.balance + long_val + short_val
+
+        # 计算浮动盈亏
+        long_profit = self.long_position * (current_price - self.long_ave_price) if self.long_position else 0
+        short_profit = self.short_position * (self.short_ave_price - current_price) if self.short_position else 0
+
+        self.net_worth = self.balance + long_profit + short_profit
         self.max_net_worth = max(self.max_net_worth, self.net_worth)
         return self.net_worth, old_net_worth, self.max_net_worth
 
-    def get_account_state(self):
-        # 这里可以改成返回更详细的分仓信息，或者简单返回总仓位和均价
-        return np.array([
-            self.balance,
-            np.sum(self.long_positions),
-            np.sum(self.short_positions),
-            np.mean(self.long_avg_prices[self.long_positions > 0]) if np.any(self.long_positions > 0) else 0.0,
-            np.mean(self.short_avg_prices[self.short_positions > 0]) if np.any(self.short_positions > 0) else 0.0
-        ], dtype=np.float32)
-
-    def get_drawdown(self):
-        return (self.max_net_worth - self.net_worth) / self.max_net_worth if self.max_net_worth > 0 else 0
-
-    def get_gain_ratio(self):
-        return (self.net_worth - self.initial_balance) / self.initial_balance
+    # ... (其他方法保持原样)
