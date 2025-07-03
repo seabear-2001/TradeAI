@@ -62,6 +62,8 @@ class TradeAgent:
         self,
         path,
         df,
+        eval_path = ".",
+         eval_freq = 1_000_000,
         model = None,
         single_step_num=3,
         num_envs=1,
@@ -86,9 +88,9 @@ class TradeAgent:
             model.set_env(env)
         eval_callback = EvalCallback(
             make_vec_env(df, tech_indicator_list, 1),  # 用于评估的环境（应是与训练环境相同但无扰动）
-            best_model_save_path="./best_model/",
-            log_path="./logs/eval/",
-            eval_freq=1_000_000,  # 每 100 万步评估一次
+            best_model_save_path=f"{eval_path}/models/",
+            log_path=f"{eval_path}/eval/",
+            eval_freq=eval_freq,  # 每 100 万步评估一次
             deterministic=True,
             render=False
         )

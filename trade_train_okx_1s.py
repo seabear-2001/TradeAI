@@ -8,10 +8,12 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 # 模型保存路径
+eval_path = '/mnt/data/'
 model_path = '/mnt/data/OKX-BTC-USDT-SWAP-1s.pt'
 data_path = "/mnt/data/klines/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
+    eval_path = './'
     model_path = './OKX-BTC-USDT-SWAP-1s.pt'
     data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
@@ -21,6 +23,7 @@ TRAIN_RATIO = 0.8
 num_envs = 8
 
 single_step_num = 1 # 每步训练的重复次数
+eval_freq = 1_000_000
 
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
 model_kwargs = {
@@ -80,6 +83,8 @@ def main():
     agent.train_model(
         path=model_path,                    # 模型保存路径
         df=train_df,                       # 训练数据DataFrame
+        eval_path=eval_path,
+        eval_freq=eval_freq,
         tech_indicator_list=all_indicator_names,  # 技术指标列表
         single_step_num=single_step_num,  # 每条数据训练多少步
         model_kwargs=model_kwargs,         # QRDQN超参数
