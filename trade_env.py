@@ -46,7 +46,6 @@ class TradeEnv(gymnasium.Env):
 
         # 初始化状态
         self.current_step = 0
-
         self.terminated_count = 0
 
     def reset(self, *, seed=None, options=None, initial_data=None):
@@ -120,10 +119,9 @@ class TradeEnv(gymnasium.Env):
         }
 
         if terminated:
-            print(info)
-            # self.terminated_count += 1
-            # if self.terminated_count % 4 == 0:
-            #     print(info)
+            self.terminated_count += 1
+            if self.terminated_count % 4 == 0:
+                print(info)
 
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info

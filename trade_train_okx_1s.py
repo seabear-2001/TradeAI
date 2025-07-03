@@ -1,3 +1,4 @@
+import os
 import platform
 
 import pandas as pd
@@ -6,6 +7,7 @@ from trade_agent import TradeAgent
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+num_envs = os.cpu_count()
 
 # 模型保存路径
 eval_path = '/root/autodl-fs/'
@@ -13,6 +15,7 @@ model_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.pt'
 data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
+    num_envs = 1
     eval_path = './'
     model_path = './OKX-BTC-USDT-SWAP-1s.pt'
     data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
@@ -20,7 +23,6 @@ if system_name == "Windows":
 
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
-num_envs = 16
 
 single_step_num = 4 # 每步训练的重复次数
 eval_freq = 1_000_000
