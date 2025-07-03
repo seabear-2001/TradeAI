@@ -81,11 +81,11 @@ def main():
     model , _ = agent.load_model("./OKX-BTC-USDT-SWAP-1s.pt", device=device)
     # 训练模型
     agent.train_model(
-        model=model,
+        # model=model,
         path=model_path,                    # 模型保存路径
         df=train_df,                       # 训练数据DataFrame
-        eval_path=eval_path,
-        eval_freq=eval_freq,
+        eval_path=eval_path,              # 模型评估数据保存路径
+        eval_freq=eval_freq,              # 模型评估频率
         tech_indicator_list=all_indicator_names,  # 技术指标列表
         single_step_num=single_step_num,  # 每条数据训练多少步
         model_kwargs=model_kwargs,         # QRDQN超参数
