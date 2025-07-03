@@ -47,6 +47,8 @@ class TradeEnv(gymnasium.Env):
         # 初始化状态
         self.current_step = 0
 
+        self.terminated_count = 0
+
     def reset(self, *, seed=None, options=None, initial_data=None):
         super().reset(seed=seed)
         self.current_step = 0
@@ -116,7 +118,8 @@ class TradeEnv(gymnasium.Env):
             'ratio': self.account.get_gain_ratio(),
             'reward': reward
         }
-        if terminated:
+        if terminated % 4 == 0:
+            self.terminated_count += 1
             print(info)
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info
