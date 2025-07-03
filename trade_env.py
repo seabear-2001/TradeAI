@@ -103,10 +103,10 @@ class TradeEnv(gymnasium.Env):
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
         gain_ratio = self.account.get_gain_ratio()
-        if gain_ratio >= self.account_take_profit_ratio:
-            terminated = True
-        elif gain_ratio <= -self.account_stop_loss_ratio:
-            terminated = True
+        # if gain_ratio >= self.account_take_profit_ratio:
+        #     terminated = True
+        # elif gain_ratio <= -self.account_stop_loss_ratio:
+        #     terminated = True
 
         # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
         if net_worth > old_net_worth and net_worth > self.account.initial_balance:
