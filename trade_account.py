@@ -37,13 +37,13 @@ class TradeAccount:
         self.short_ave_price = 0.0
 
     def open_long(self, current_price):
+        if self.long_position < 0:
+            return False
         """按指定数量开多头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
-        amount = max_position_amount
+        amount = min(max_position_amount, self.long_position)
         fee = amount * current_price * self.fee_rate * 0 # 取消开仓手续费
         cost = amount * current_price / self.leverage + fee
-        if self.long_position > 0:
-            return False
         if self.balance >= cost and amount > 0:
             total_cost = self.long_position * self.long_ave_price + amount * current_price
             self.long_position += amount
@@ -69,13 +69,13 @@ class TradeAccount:
         return True
 
     def open_short(self, current_price):
+        if self.short_position < 0:
+            return False
         """按指定数量开空头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
-        amount = max_position_amount
+        amount = min(max_position_amount,self.short_position)
         fee = amount * current_price * self.fee_rate * 0 # 取消开仓手续费
         cost = amount * current_price / self.leverage + fee
-        if self.short_position > 0:
-            return False
         if self.balance >= cost and amount > 0:
             total_cost = self.short_position * self.short_ave_price + amount * current_price
             self.short_position += amount
