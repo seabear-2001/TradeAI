@@ -31,7 +31,7 @@ model_kwargs = {
     "train_freq": 2,                  # 每执行多少步训练一次模型 和 每次训练的更新步数
     "gradient_steps": 1,              # 每次训练的更新步数
     "target_update_interval": 1000,   # 目标网络更新频率
-    "exploration_fraction": 0.5,      # epsilon衰减比例，前50%训练是探索
+    "exploration_fraction": 0.4,      # epsilon衰减比例，前50%训练是探索
     "exploration_final_eps": 0.02,    # epsilon最终最小值
     "gamma": 0.99,                   # 折扣因子，考虑未来奖励的权重
 }
