@@ -95,7 +95,7 @@ class TradeEnv(gymnasium.Env):
             account_order_res = self.account.close_short(current_price)
 
         if account_order_res is False:
-            reward -= 0.001
+            reward -= 0.01
 
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
@@ -119,7 +119,7 @@ class TradeEnv(gymnasium.Env):
         if dd_delta > 0:
             reward -= dd_delta * 1000
         if gain_ratio < 0.01:
-            reward -= 0.001
+            reward -= 0.01
 
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
