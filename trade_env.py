@@ -119,7 +119,7 @@ class TradeEnv(gymnasium.Env):
         if dd_delta > 0:
             reward -= dd_delta * 1000
         if gain_ratio < 0.01:
-            reward -= 0.01
+            reward -= gain_ratio
 
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
