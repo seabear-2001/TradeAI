@@ -131,7 +131,7 @@ class TradeEnv(gymnasium.Env):
             'reward': reward
         }
         self.last_print_step = 0
-        if terminated:
+        if terminated and self.current_step-self.last_print_step > 10000:
             print(info)
             self.last_print_step = self.current_step
 
