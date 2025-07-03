@@ -40,7 +40,7 @@ class TradeAgent:
         }, path)
         print(f"[模型已保存至 {path}]")
 
-    def load_model(self, path, env=None, model_kwargs=None, policy_kwargs=None, device="cpu"):
+    def load_model(self, path, env=None, model_kwargs=None, policy_kwargs=None, device="cuda"):
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None, None

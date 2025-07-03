@@ -81,7 +81,7 @@ def main():
 
     # 训练模型
     agent.train_model(
-        model=torch.load("./OKX-BTC-USDT-SWAP-1s.pt", weights_only=False),
+        model=agent.load_model("./OKX-BTC-USDT-SWAP-1s.pt", device=device),
         path=model_path,                    # 模型保存路径
         df=train_df,                       # 训练数据DataFrame
         eval_path=eval_path,
