@@ -163,7 +163,7 @@ class TradeAccount:
         short_val = np.sum(self.short_positions * (self.short_avg_prices - current_price))
         self.net_worth = self.balance + long_val + short_val
         self.max_net_worth = max(self.max_net_worth, self.net_worth)
-        return self.net_worth, old_net_worth
+        return self.net_worth, old_net_worth, self.max_net_worth
 
     def get_account_state(self):
         # 这里可以改成返回更详细的分仓信息，或者简单返回总仓位和均价

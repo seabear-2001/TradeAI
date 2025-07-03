@@ -130,9 +130,9 @@ class TradeEnv(gymnasium.Env):
             terminated = True
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
-        net_worth, old_net_worth = self.account.update_net_worth(current_price)
+        net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
         reward += (net_worth - old_net_worth) / self.account.initial_balance * 5 # 本步收益
-        # reward -= self.account.get_drawdown() # 本步回撤
+        reward -= (max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0 # 本步回撤
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
@@ -145,7 +145,7 @@ class TradeEnv(gymnasium.Env):
             'reward': reward
         }
 
-        # print(reward)
+        print(action)
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info
 
