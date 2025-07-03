@@ -131,7 +131,7 @@ class TradeEnv(gymnasium.Env):
             'ratio': self.account.get_gain_ratio(),
             'reward': reward
         }
-        if terminated and self.current_step-self.last_print_step > 10000:
+        if terminated or self.current_step-self.last_print_step > 10000:
             print(info)
             self.last_print_step = self.current_step
 
