@@ -118,20 +118,20 @@ class TradeEnv(gymnasium.Env):
             else:
                 efficient = False
 
-        if not efficient:
-            reward -= 0.001
+        # if not efficient:
+        #     reward -= 0.001
 
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
-            reward += 0.01
+            # reward += 0.01
             terminated = True
         elif gain_ratio <= -self.account_stop_loss_ratio:
-            reward -= 0.01
+            # reward -= 0.01
             terminated = True
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
-        reward += (net_worth - old_net_worth) / self.account.initial_balance * 20.0 # 本步收益
+        reward += (net_worth - old_net_worth) / self.account.initial_balance  # 本步收益
         # reward -= (max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0 # 本步回撤
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
