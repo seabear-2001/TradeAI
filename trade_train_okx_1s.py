@@ -78,10 +78,10 @@ def main():
 
     # 实例化交易代理
     agent = TradeAgent()
-
+    model , _ = agent.load_model("./OKX-BTC-USDT-SWAP-1s.pt", device=device)
     # 训练模型
     agent.train_model(
-        model=agent.load_model("./OKX-BTC-USDT-SWAP-1s.pt", device=device),
+        model=model,
         path=model_path,                    # 模型保存路径
         df=train_df,                       # 训练数据DataFrame
         eval_path=eval_path,
