@@ -117,7 +117,7 @@ class TradeEnv(gymnasium.Env):
         prev_drawdown = (max_net_worth - old_net_worth) / max_net_worth if max_net_worth > 0 else 0
         dd_delta = drawdown - prev_drawdown
         if dd_delta > 0:
-            reward -= dd_delta * 1000
+            reward -= dd_delta * 100
         if gain_ratio < 0.01:
             reward -= gain_ratio
 
