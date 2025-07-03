@@ -118,15 +118,13 @@ class TradeEnv(gymnasium.Env):
             else:
                 efficient = False
 
-        # if not efficient:
-        #     reward -= 0.001
+        if not efficient:
+            reward -= 0.001
 
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
-            # reward += 0.01
             terminated = True
         elif gain_ratio <= -self.account_stop_loss_ratio:
-            # reward -= 0.01
             terminated = True
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
