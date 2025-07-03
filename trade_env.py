@@ -99,7 +99,7 @@ class TradeEnv(gymnasium.Env):
                 if res is False:
                     efficient = False
                 else:
-                    reward += 0.01
+                    reward += 0.001
             else:
                 efficient = False
         elif 11 <= action <= 15:  # 开空档位
@@ -114,7 +114,7 @@ class TradeEnv(gymnasium.Env):
                 if res is False:
                     efficient = False
                 else:
-                    reward += 0.01
+                    reward += 0.001
             else:
                 efficient = False
 
