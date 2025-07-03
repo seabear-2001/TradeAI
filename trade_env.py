@@ -103,12 +103,20 @@ class TradeEnv(gymnasium.Env):
         elif gain_ratio <= -self.account_stop_loss_ratio:
             terminated = True
 
-        # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
+        # 假设你之前保存了 last_max_net_worth（上一步的 max），用于计算新增回撤
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
+
+        # 1. 本步收益奖励
         if net_worth > old_net_worth:
-            reward += (net_worth - old_net_worth) / self.account.initial_balance * 100  # 本步收益
-        if max_net_worth > net_worth:
-            reward -= (max_net_worth - net_worth) / max_net_worth * 100 # 本步回撤
+            reward += (net_worth - old_net_worth) / self.account.initial_balance * 100
+
+        # 2. 本步新增回撤惩罚（只惩罚 max_net_worth - net_worth 的“增长部分”）
+        if max_net_worth > net_worth and max_net_worth > old_net_worth:
+            drawdown_prev = (max_net_worth - old_net_worth) / max_net_worth
+            drawdown_now = (max_net_worth - net_worth) / max_net_worth
+            dd_increase = drawdown_now - drawdown_prev
+            if dd_increase > 0:
+                reward -= dd_increase * 100
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
