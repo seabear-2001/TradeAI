@@ -34,7 +34,7 @@ model_kwargs = {
     "learning_starts": 100_000,        # 收集多少步后开始训练
     "batch_size": 512,                # 每次训练采样大小
     "train_freq": 2,                  # 每执行多少步训练一次模型 和 每次训练的更新步数
-    "gradient_steps": 8,              # 每次训练的更新步数
+    "gradient_steps": 4,              # 每次训练的更新步数
     "target_update_interval": 1000,   # 目标网络更新频率
     "exploration_fraction": 0.5,      # epsilon衰减比例，前40%训练是探索
     "exploration_final_eps": 0.05,    # epsilon最终最小值
