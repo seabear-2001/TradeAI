@@ -48,6 +48,7 @@ class TradeEnv(gymnasium.Env):
         self.current_step = 0
         self.terminated_count = 0
         self.last_print_step = 0
+        self.total_step = 0
 
     def reset(self, *, seed=None, options=None, initial_data=None):
         super().reset(seed=seed)
@@ -64,7 +65,6 @@ class TradeEnv(gymnasium.Env):
         else:
             self.account.reset()
             assert self.data_array is not None and len(self.data_array) > 0, "训练模式必须提供数据"
-        self.last_print_step = 0
 
         return self._get_observation(), {}
 
@@ -116,8 +116,6 @@ class TradeEnv(gymnasium.Env):
         dd_delta = drawdown - prev_drawdown
         if dd_delta > 0:
             reward -= dd_delta * 100
-        if gain_ratio < 0.02:
-            reward -= gain_ratio
 
         reward *= 50
 
@@ -131,11 +129,12 @@ class TradeEnv(gymnasium.Env):
             'ratio': self.account.get_gain_ratio(),
             'reward': reward
         }
-        if terminated or self.current_step-self.last_print_step > 10000:
+        if terminated or self.total_step-self.last_print_step > 10000:
             print(info)
-            self.last_print_step = self.current_step
+            self.last_print_step = self.total_step
 
         self.current_step += 1
+        self.total_step += 1
         return self._get_observation(), reward, terminated, truncated, info
 
     def render(self):
