@@ -42,7 +42,7 @@ class TradeAccount:
         """按指定数量开多头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
         amount = max_position_amount
-        fee = amount * current_price * self.fee_rate * 0 # 取消开仓手续费
+        fee = amount * current_price * self.fee_rate
         cost = amount * current_price / self.leverage + fee
         if self.balance >= cost and amount > 0:
             total_cost = self.long_position * self.long_ave_price + amount * current_price
@@ -58,7 +58,7 @@ class TradeAccount:
             return False
 
         actual_amount = self.long_position
-        fee = actual_amount * current_price * self.fee_rate * 2 # 加上开仓手续费
+        fee = actual_amount * current_price * self.fee_rate
         profit = (current_price - self.long_ave_price) * actual_amount
         margin = self.long_ave_price * actual_amount / self.leverage
 
@@ -74,7 +74,7 @@ class TradeAccount:
         """按指定数量开空头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
         amount = max_position_amount
-        fee = amount * current_price * self.fee_rate * 0 # 取消开仓手续费
+        fee = amount * current_price * self.fee_rate
         cost = amount * current_price / self.leverage + fee
         if self.balance >= cost and amount > 0:
             total_cost = self.short_position * self.short_ave_price + amount * current_price
@@ -90,7 +90,7 @@ class TradeAccount:
             return False
 
         actual_amount = self.short_position
-        fee = actual_amount * current_price * self.fee_rate * 2 # 添加开仓手续费
+        fee = actual_amount * current_price * self.fee_rate
         profit = (self.short_ave_price - current_price) * actual_amount
         margin = self.short_ave_price * actual_amount / self.leverage
 
