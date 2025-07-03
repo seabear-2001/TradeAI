@@ -93,7 +93,7 @@ class TradeEnv(gymnasium.Env):
             account_order_res = self.account.close_short(current_price)
 
         if account_order_res is False:
-            reward -= 0.001
+            reward -= 0.01
 
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
@@ -103,8 +103,8 @@ class TradeEnv(gymnasium.Env):
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
-        reward += (net_worth - old_net_worth) / self.account.initial_balance * 10  # 本步收益
-        reward -= (max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0 # 本步回撤
+        reward += (net_worth - old_net_worth) / self.account.initial_balance * 100  # 本步收益
+        reward -= ((max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0) * 20 # 本步回撤
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
