@@ -118,11 +118,6 @@ class TradeEnv(gymnasium.Env):
             else:
                 efficient = False
 
-        # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
-        net_worth, old_net_worth = self.account.update_net_worth(current_price)
-        reward += (net_worth - old_net_worth) / self.account.initial_balance * 5 # 本步收益
-        # reward -= self.account.get_drawdown() # 本步回撤
-
         if not efficient:
             reward -= 0.001
 
@@ -133,6 +128,11 @@ class TradeEnv(gymnasium.Env):
         elif gain_ratio <= -self.account_stop_loss_ratio:
             reward -= 0.01
             terminated = True
+
+        # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
+        net_worth, old_net_worth = self.account.update_net_worth(current_price)
+        reward += (net_worth - old_net_worth) / self.account.initial_balance * 5 # 本步收益
+        # reward -= self.account.get_drawdown() # 本步回撤
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
