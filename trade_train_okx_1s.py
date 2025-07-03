@@ -22,7 +22,7 @@ if system_name == "Windows":
 TRAIN_RATIO = 0.8
 num_envs = 8
 
-single_step_num = 1 # 每步训练的重复次数
+single_step_num = 2 # 每步训练的重复次数
 eval_freq = 1_000_000
 
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
