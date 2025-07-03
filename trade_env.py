@@ -120,7 +120,7 @@ class TradeEnv(gymnasium.Env):
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
         net_worth, old_net_worth = self.account.update_net_worth(current_price)
-        reward += (net_worth - old_net_worth) / self.account.initial_balance * 100 # 本步收益
+        reward += (net_worth - old_net_worth) / self.account.initial_balance * 10 # 本步收益
         # reward -= self.account.get_drawdown() * 2 # 本步回撤
 
         if not efficient:
