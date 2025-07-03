@@ -103,21 +103,19 @@ class TradeEnv(gymnasium.Env):
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
         gain_ratio = self.account.get_gain_ratio()
-        # if gain_ratio >= self.account_take_profit_ratio:
-        #     terminated = True
-        # elif gain_ratio <= -self.account_stop_loss_ratio:
-        #     terminated = True
-        if self.account.balance <= 0:
+        if gain_ratio >= self.account_take_profit_ratio:
+            terminated = True
+        elif gain_ratio <= -self.account_stop_loss_ratio:
             terminated = True
 
-        # # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
-        # if net_worth > old_net_worth and net_worth > self.account.initial_balance:
-        #     reward += (min((net_worth - old_net_worth), (net_worth - self.account.initial_balance))
-        #                / self.account.initial_balance * 100)
+        # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
+        if net_worth > old_net_worth and net_worth > self.account.initial_balance:
+            reward += (min((net_worth - old_net_worth), (net_worth - self.account.initial_balance))
+                       / self.account.initial_balance * 100)
 
-        # ✅ 净值奖励
-        if net_worth > old_net_worth:
-            reward += (net_worth - old_net_worth) / self.account.initial_balance * 100
+        # # ✅ 净值奖励
+        # if net_worth > old_net_worth:
+        #     reward += (net_worth - old_net_worth) / self.account.initial_balance * 100
 
         # ✅ 回撤惩罚（只惩罚新增回撤）
         drawdown = (max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0
