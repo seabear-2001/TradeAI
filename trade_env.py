@@ -119,9 +119,9 @@ class TradeEnv(gymnasium.Env):
             'reward': reward
         }
         if self.terminated_count % 4 == 1:
-            self.terminated_count += 1
             print(info)
         self.current_step += 1
+        self.terminated_count += 1
         return self._get_observation(), reward, terminated, truncated, info
 
     def render(self):
