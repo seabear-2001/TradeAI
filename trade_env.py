@@ -120,9 +120,10 @@ class TradeEnv(gymnasium.Env):
         }
 
         if terminated:
-            self.terminated_count += 1
-            if self.terminated_count % 4 == 0:
-                print(info)
+            print(info)
+            # self.terminated_count += 1
+            # if self.terminated_count % 4 == 0:
+            #     print(info)
 
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info
