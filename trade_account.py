@@ -50,6 +50,9 @@ class TradeAccount:
         if self.balance * self.leverage < cost:
             return False
 
+        if slot_idx in self.long_positions and self.long_positions[slot_idx] > 1e-8:
+            return False
+
         old_amount = self.long_positions[slot_idx]
         old_avg = self.long_avg_prices[slot_idx]
 
@@ -106,6 +109,9 @@ class TradeAccount:
         fee = amount * current_price * self.fee_rate
         cost = fee
         if self.balance * self.leverage < cost:
+            return False
+
+        if slot_idx in self.short_positions and self.short_positions[slot_idx] > 1e-8:
             return False
 
         old_amount = self.short_positions[slot_idx]
