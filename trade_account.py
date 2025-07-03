@@ -8,7 +8,7 @@ class TradeAccount:
             self,
             initial_balance=1000000,         # 初始账户资金
             leverage=100,                    # 杠杆倍数，用于计算保证金
-            fee_rate=0.0000,                  # 交易手续费率
+            fee_rate=0.0005,                  # 交易手续费率
             max_position_ratio= 0.2
     ):
         # 账户参数
@@ -114,7 +114,7 @@ class TradeAccount:
 
     def get_drawdown(self):
         """计算当前回撤"""
-        return (self.max_net_worth - self.net_worth) / self.max_net_worth if self.max_net_worth > 0 else 0
+        return (self.max_net_worth - self.net_worth) / self.max_net_worth
 
     def get_gain_ratio(self):
         """计算账户盈亏比例"""

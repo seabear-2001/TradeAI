@@ -105,12 +105,10 @@ class TradeEnv(gymnasium.Env):
 
         # 后续净值更新、回撤、盈亏、止盈止损等逻辑保持不变
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
-
-        # if net_worth > self.account.initial_balance:
-        #     reward += (net_worth - old_net_worth) / self.account.initial_balance * 100  # 本步收益
-        reward -= ((max_net_worth - net_worth) / max_net_worth) * 100 # 本步回撤  if max_net_worth > 0 else 0
-        # if net_worth < self.account.initial_balance:
-        #     reward -= self.account.get_gain_ratio() * 100
+        if net_worth > old_net_worth:
+            reward += (net_worth - old_net_worth) / self.account.initial_balance * 100  # 本步收益
+        if max_net_worth > net_worth:
+            reward -= (max_net_worth - net_worth) / max_net_worth * 100 # 本步回撤
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
