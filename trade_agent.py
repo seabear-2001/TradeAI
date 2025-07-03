@@ -76,7 +76,6 @@ class TradeAgent:
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         check_timestamp_consistency(df)
 
-
         env = make_vec_env(df, tech_indicator_list, num_envs)
         print(f"✅ {num_envs}环境并行构建完成")
 
@@ -85,6 +84,7 @@ class TradeAgent:
             model._model_kwargs = model_kwargs
             model._policy_kwargs = policy_kwargs
         else:
+            print(f"[模型 {path}] 继续训练")
             model.set_env(env)
         eval_callback = EvalCallback(
             make_vec_env(df, tech_indicator_list, 1),  # 用于评估的环境（应是与训练环境相同但无扰动）
