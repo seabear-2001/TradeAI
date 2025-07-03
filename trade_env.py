@@ -145,7 +145,7 @@ class TradeEnv(gymnasium.Env):
             'reward': reward
         }
 
-        print(action)
+        # print(reward)
         self.current_step += 1
         return self._get_observation(), reward, terminated, truncated, info
 
