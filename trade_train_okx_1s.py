@@ -7,7 +7,7 @@ from trade_agent import TradeAgent
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-num_envs = 20
+num_envs = 16
 
 # 模型保存路径
 eval_path = '/root/autodl-fs/'
