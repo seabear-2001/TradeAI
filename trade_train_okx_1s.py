@@ -76,7 +76,7 @@ def main():
 
     # 实例化交易代理
     agent = TradeAgent()
-    model , _ = agent.load_model("./OKX-BTC-USDT-SWAP-1s.pt", device=device)
+    # model , _ = agent.load_model("./OKX-BTC-USDT-SWAP-1s.pt", device=device)
     # 训练模型
     agent.train_model(
         # model=model,
