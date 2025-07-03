@@ -64,6 +64,7 @@ class TradeEnv(gymnasium.Env):
         else:
             self.account.reset()
             assert self.data_array is not None and len(self.data_array) > 0, "训练模式必须提供数据"
+        self.last_print_step = 0
 
         return self._get_observation(), {}
 
@@ -130,7 +131,6 @@ class TradeEnv(gymnasium.Env):
             'ratio': self.account.get_gain_ratio(),
             'reward': reward
         }
-        self.last_print_step = 0
         if terminated and self.current_step-self.last_print_step > 10000:
             print(info)
             self.last_print_step = self.current_step
