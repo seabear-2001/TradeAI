@@ -67,8 +67,6 @@ all_indicator_names = [
     "vwap"
 ]
 def main():
-    print(f"设备: {device}")
-
     # 读取预处理好的特征数据CSV
     base_data = pd.read_csv(data_path)
     print(f"原始数据长度: {len(base_data)}")
