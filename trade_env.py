@@ -106,7 +106,7 @@ class TradeEnv(gymnasium.Env):
         elif gain_ratio <= -self.account_stop_loss_ratio:
             terminated = True
 
-        # ✅ 本步收益（只在净值上涨时给予）
+        # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
         if net_worth > old_net_worth and net_worth > self.account.initial_balance:
             reward += min((net_worth - old_net_worth), (net_worth - self.account.initial_balance)) / self.account.initial_balance * 100
 
