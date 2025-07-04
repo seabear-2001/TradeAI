@@ -38,12 +38,12 @@ model_kwargs = {
     "target_update_interval": 2000,   # 目标网络更新频率
     "exploration_fraction": 0.5,      # epsilon衰减比例，前50%训练是探索
     "exploration_final_eps": 0.05,    # epsilon最终最小值
-    "gamma": 0.9,                   # 折扣因子，考虑未来奖励的权重
+    "gamma": 0.95,                   # 折扣因子，考虑未来奖励的权重
 }
 
 # 策略网络结构及激活函数
 policy_kwargs = dict(
-    net_arch=[512, 512, 256, 128],
+    net_arch=[256, 256],
     activation_fn=torch.nn.ReLU
 )
 
