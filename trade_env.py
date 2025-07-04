@@ -53,6 +53,7 @@ class TradeEnv(gymnasium.Env):
 
     def reset(self, *, seed=None, options=None, initial_data=None):
         super().reset(seed=seed)
+        self.current_step = 0
         self.total_reward = 0
         # 实盘模式数据传入
         if self.live_mode:
