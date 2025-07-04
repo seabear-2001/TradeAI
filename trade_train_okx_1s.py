@@ -7,7 +7,7 @@ from trade_agent import TradeAgent
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-num_envs = 8
+num_envs = 10
 
 # 模型保存路径
 eval_path = '/root/autodl-fs/'
@@ -33,8 +33,8 @@ model_kwargs = {
     "buffer_size": 20_000_000,           # 经验回放池大小，越大越稳定但占内存
     "learning_starts": 100_000,        # 收集多少步后开始训练
     "batch_size": 512,                # 每次训练采样大小
-    "train_freq": 1,                  # 每执行多少步训练一次模型 和 每次训练的更新步数
-    "gradient_steps": 4,              # 每次训练的更新步数
+    "train_freq": 2,                  # 每执行多少步训练一次模型 和 每次训练的更新步数
+    "gradient_steps": 2,              # 每次训练的更新步数
     "target_update_interval": 2000,   # 目标网络更新频率
     "exploration_fraction": 0.5,      # epsilon衰减比例，前40%训练是探索
     "exploration_final_eps": 0.05,    # epsilon最终最小值
