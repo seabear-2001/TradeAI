@@ -15,8 +15,8 @@ class TradeEnv(gymnasium.Env):
             df=None,                            # 训练数据，DataFrame 格式
             tech_indicator_list=None,           # 技术指标列名列表
             account=None,                       # 交易账户实例
-            account_stop_loss_ratio=0.03,        # 账户整体止损比例
-            account_take_profit_ratio=0.05,      # 账户整体止盈比例
+            account_stop_loss_ratio=0.10,        # 账户整体止损比例
+            account_take_profit_ratio=0.10,      # 账户整体止盈比例
     ):
         super().__init__()
 
