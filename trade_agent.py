@@ -3,6 +3,7 @@ import pandas as pd
 import torch
 from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import EvalCallback
+from stable_baselines3.common.monitor import Monitor
 
 from trade_env import TradeEnv
 
@@ -86,17 +87,17 @@ class TradeAgent:
         else:
             print(f"[模型 {path}] 继续训练")
             model.set_env(env)
-        eval_callback = EvalCallback(
-            make_vec_env(df, tech_indicator_list, 1),  # 用于评估的环境（应是与训练环境相同但无扰动）
-            best_model_save_path=f"{eval_path}/models/",
-            log_path=f"{eval_path}/eval/",
-            eval_freq=eval_freq,  # 每 100 万步评估一次
-            deterministic=True,
-            render=False
-        )
+        # eval_callback = EvalCallback(
+        #     Monitor(TradeEnv(df=df, tech_indicator_list=tech_indicator_list)),  # 用于评估的环境（应是与训练环境相同但无扰动）
+        #     best_model_save_path=f"{eval_path}/models/",
+        #     log_path=f"{eval_path}/eval/",
+        #     eval_freq=eval_freq,  # 每 100 万步评估一次
+        #     deterministic=True,
+        #     render=False
+        # )
         total_timesteps = len(df) * single_step_num
         try:
-            model.learn(total_timesteps=int(total_timesteps), callback=eval_callback , progress_bar=True)
+            model.learn(total_timesteps=int(total_timesteps) , progress_bar=True)
         except KeyboardInterrupt:
             print("训练被手动终止，开始保存模型...")
 
