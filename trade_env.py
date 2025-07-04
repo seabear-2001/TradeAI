@@ -16,7 +16,7 @@ class TradeEnv(gymnasium.Env):
             tech_indicator_list=None,           # 技术指标列名列表
             account=None,                       # 交易账户实例
             account_stop_loss_ratio=0.10,        # 账户整体止损比例
-            account_take_profit_ratio=0.01,      # 账户整体止盈比例
+            account_take_profit_ratio=0.10,      # 账户整体止盈比例
     ):
         super().__init__()
 
@@ -130,15 +130,7 @@ class TradeEnv(gymnasium.Env):
         self.current_step += 1
         self.total_step += 1
 
-        info = {
-            'net_worth': self.account.net_worth,
-            'action': action,
-            'reward': reward,
-            'total_reward': self.total_reward
-        }
-        if terminated: #or self.total_step-self.last_print_step > 10000
-            print(info)
-            # self.last_print_step = self.total_step
+
         return self._get_observation(), reward, terminated, truncated, info
 
     def render(self):
