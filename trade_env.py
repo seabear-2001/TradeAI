@@ -97,9 +97,9 @@ class TradeEnv(gymnasium.Env):
             account_order_res = self.account.close_short(current_price)
 
         if account_order_res is False:
-            reward -= 0.01
+            reward -= 0.1
         elif account_order_res is True:
-            reward += 0.01
+            reward += 0.1
 
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
