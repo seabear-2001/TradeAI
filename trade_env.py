@@ -109,7 +109,7 @@ class TradeEnv(gymnasium.Env):
         elif gain_ratio <= -self.account_stop_loss_ratio:
             terminated = True
 
-        reward += net_worth - old_net_worth / self.account.initial_balance * 100
+        reward += (net_worth - old_net_worth) / self.account.initial_balance * 100
 
         # # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
         # if net_worth > old_net_worth and net_worth > self.account.initial_balance:
