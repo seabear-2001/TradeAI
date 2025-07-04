@@ -121,8 +121,6 @@ class TradeEnv(gymnasium.Env):
         if dd_delta > 0:
             reward -= dd_delta * 100
 
-        reward *= 10
-
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
 
