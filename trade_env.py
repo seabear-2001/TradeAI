@@ -126,6 +126,10 @@ class TradeEnv(gymnasium.Env):
             terminated = True
 
         truncated = False
+        self.total_reward += reward
+        self.current_step += 1
+        self.total_step += 1
+
         info = {
             'net_worth': self.account.net_worth,
             'action': action,
@@ -135,9 +139,6 @@ class TradeEnv(gymnasium.Env):
         if terminated: #or self.total_step-self.last_print_step > 10000
             print(info)
             # self.last_print_step = self.total_step
-        self.total_reward += reward
-        self.current_step += 1
-        self.total_step += 1
         return self._get_observation(), reward, terminated, truncated, info
 
     def render(self):
