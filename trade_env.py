@@ -95,10 +95,10 @@ class TradeEnv(gymnasium.Env):
         elif action == 4:  # 平空档位
             account_order_res = self.account.close_short(current_price)
 
-        # if account_order_res is False:
-        #     reward -= 0.01
-        # elif account_order_res is True:
-        #     reward += 0.01
+        if account_order_res is False:
+            reward -= 0.01
+        elif account_order_res is True:
+            reward += 0.01
 
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
