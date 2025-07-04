@@ -109,17 +109,18 @@ class TradeEnv(gymnasium.Env):
         elif gain_ratio <= -self.account_stop_loss_ratio:
             terminated = True
 
-        # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
-        if net_worth > old_net_worth and net_worth > self.account.initial_balance:
-            reward += (min((net_worth - old_net_worth), (net_worth - self.account.initial_balance))
-                       / self.account.initial_balance * 100)
+        reward += net_worth - old_net_worth / self.account.initial_balance * 100
 
-        # ✅ 回撤惩罚（只惩罚新增回撤）
-        drawdown = (max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0
-        prev_drawdown = (max_net_worth - old_net_worth) / max_net_worth if max_net_worth > 0 else 0
-        dd_delta = drawdown - prev_drawdown
-        if dd_delta > 0:
-            reward -= dd_delta * 100
+        # # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
+        # if net_worth > old_net_worth and net_worth > self.account.initial_balance:
+        #     reward += (min((net_worth - old_net_worth), (net_worth - self.account.initial_balance))
+        #                / self.account.initial_balance * 100)
+        # # ✅ 回撤惩罚（只惩罚新增回撤）
+        # drawdown = (max_net_worth - net_worth) / max_net_worth if max_net_worth > 0 else 0
+        # prev_drawdown = (max_net_worth - old_net_worth) / max_net_worth if max_net_worth > 0 else 0
+        # dd_delta = drawdown - prev_drawdown
+        # if dd_delta > 0:
+        #     reward -= dd_delta * 100
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
