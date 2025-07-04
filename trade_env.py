@@ -15,8 +15,8 @@ class TradeEnv(gymnasium.Env):
             df=None,                            # 训练数据，DataFrame 格式
             tech_indicator_list=None,           # 技术指标列名列表
             account=None,                       # 交易账户实例
-            account_stop_loss_ratio=0.1,        # 账户整体止损比例
-            account_take_profit_ratio=0.1,      # 账户整体止盈比例
+            account_stop_loss_ratio=0.03,        # 账户整体止损比例
+            account_take_profit_ratio=0.05,      # 账户整体止盈比例
     ):
         super().__init__()
 
@@ -97,9 +97,9 @@ class TradeEnv(gymnasium.Env):
             account_order_res = self.account.close_short(current_price)
 
         if account_order_res is False:
-            reward -= 0.1
+            reward -= 0.05
         elif account_order_res is True:
-            reward += 0.1
+            reward += 0.05
 
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
