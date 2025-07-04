@@ -49,11 +49,12 @@ class TradeEnv(gymnasium.Env):
         self.terminated_count = 0
         self.last_print_step = 0
         self.total_step = 0
+        self.total_reward = 0
 
     def reset(self, *, seed=None, options=None, initial_data=None):
         super().reset(seed=seed)
         self.current_step = 0
-
+        self.total_reward = 0
         # 实盘模式数据传入
         if self.live_mode:
             if initial_data is not None:
@@ -129,13 +130,13 @@ class TradeEnv(gymnasium.Env):
         info = {
             'net_worth': self.account.net_worth,
             'action': action,
-            'ratio': self.account.get_gain_ratio(),
-            'reward': reward
+            'reward': reward,
+            'total_reward': self.total_reward
         }
         if terminated or self.total_step-self.last_print_step > 10000:
             print(info)
             self.last_print_step = self.total_step
-
+        self.total_reward += reward
         self.current_step += 1
         self.total_step += 1
         return self._get_observation(), reward, terminated, truncated, info
