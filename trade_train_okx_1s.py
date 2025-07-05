@@ -24,7 +24,7 @@ if system_name == "Windows":
 # 训练数据集划分比例
 TRAIN_RATIO = 0.8
 
-single_step_num = 50 # 每步训练的重复次数
+single_step_num = 4 # 每步训练的重复次数
 eval_freq = 1_000_000
 
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
@@ -36,14 +36,14 @@ model_kwargs = {
     "train_freq": 1,                  # 每执行多少步训练一次模型 和 每次训练的更新步数
     "gradient_steps": 4,              # 每次训练的更新步数
     "target_update_interval": 2000,   # 目标网络更新频率
-    "exploration_fraction": 0.02,      # epsilon衰减比例，前50%训练是探索
-    "exploration_final_eps": 0.01,    # epsilon最终最小值
+    "exploration_fraction": 0.05,      # epsilon衰减比例，前50%训练是探索
+    "exploration_final_eps": 0.02,    # epsilon最终最小值
     "gamma": 0.95,                   # 折扣因子，考虑未来奖励的权重
 }
 
 # 策略网络结构及激活函数
 policy_kwargs = dict(
-    net_arch=[256, 256],
+    net_arch=[512, 512, 256, 128],
     activation_fn=torch.nn.ReLU
 )
 
