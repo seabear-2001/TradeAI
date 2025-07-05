@@ -29,7 +29,7 @@ eval_freq = 1_000_000
 
 # QRDQN算法相关超参数配置，参考SB3文档和经验调整
 model_kwargs = {
-    "learning_rate": 5e-5,            # 学习率，越小越稳定
+    "learning_rate": 1e-5,            # 学习率，越小越稳定
     "buffer_size": 50_000_000,           # 经验回放池大小，越大越稳定但占内存
     "learning_starts": 1_000_000,        # 收集多少步后开始训练
     "batch_size": 4096,                # 每次训练采样大小
