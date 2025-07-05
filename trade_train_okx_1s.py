@@ -10,13 +10,13 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 num_envs = 1
 
 # 模型保存路径
-eval_path = '/root/autodl-fs/' # /mnt/data/  /root/autodl-fs/
+models_backup_path = '/root/autodl-fs/' # /mnt/data/  /root/autodl-fs/
 model_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.pt'
 data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
     num_envs = 1
-    eval_path = './'
+    models_backup_path = './'
     model_path = './OKX-BTC-USDT-SWAP-1s.pt'
     data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
@@ -79,9 +79,9 @@ def main():
     # 实例化交易代理
     agent = TradeAgent()
     agent.train_model(
-        path=model_path,                    # 模型保存路径
+        model_path=model_path,                    # 模型保存路径
         df=train_df,                       # 训练数据DataFrame
-        eval_path=eval_path,              # 模型评估数据保存路径
+        models_backup_path=models_backup_path,              # 模型评估数据保存路径
         eval_freq=eval_freq,              # 模型评估频率
         tech_indicator_list=all_indicator_names,  # 技术指标列表
         single_step_num=single_step_num,  # 每条数据训练多少步

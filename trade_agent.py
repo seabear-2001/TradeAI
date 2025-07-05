@@ -59,9 +59,9 @@ class TradeAgent:
 
     def train_model(
         self,
-        path,
+        model_path,
         df,
-        eval_path = ".",
+        models_backup_path =".",
         tech_indicator_list=None,
         model_kwargs=None,
         policy_kwargs=None,
@@ -75,7 +75,7 @@ class TradeAgent:
         check_timestamp_consistency(df)
 
         env = make_vec_env(df, tech_indicator_list, num_envs)
-        model, _ = self.load_model(path=path,env=env, device=device)
+        model, _ = self.load_model(path=model_path, env=env, device=device)
         print(f"✅ {num_envs}环境并行构建完成")
 
         if model is None:
@@ -83,17 +83,17 @@ class TradeAgent:
             model._model_kwargs = model_kwargs
             model._policy_kwargs = policy_kwargs
         else:
-            print(f"[模型 {path}] 继续训练")
+            print(f"[模型 {model_path}] 继续训练")
             model.set_env(env)
         total_timesteps = len(df) * single_step_num
         try:
-            model.learn(total_timesteps=int(total_timesteps), reset_num_timesteps=False, callback=CheckpointCallback(save_freq=eval_freq, save_path=eval_path, name_prefix="qrdqn_model"))
+            model.learn(total_timesteps=int(total_timesteps), reset_num_timesteps=False, callback=CheckpointCallback(save_freq=eval_freq, save_path=models_backup_path, name_prefix="qrdqn_model"))
         except KeyboardInterrupt:
             print("训练被手动终止，开始保存模型...")
 
         last_ts = int(df['timestamp'].max().timestamp())
-        self.save_model(path, model, last_ts)
-        print(f"[模型 {path}] 训练完成，最后时间戳更新为 {last_ts}")
+        self.save_model(model_path, model, last_ts)
+        print(f"[模型 {model_path}] 训练完成，最后时间戳更新为 {last_ts}")
 
     @staticmethod
     def _params_equal(params1, params2):
