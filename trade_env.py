@@ -95,10 +95,6 @@ class TradeEnv(gymnasium.Env):
         elif action == 4:  # 平空档位
             account_order_res = self.account.close_short(current_price)
 
-        if action in [1, 2, 3, 4] and account_order_res:
-            max_position_amount = self.account.balance / current_price * self.account.max_position_ratio
-            fee = current_price * max_position_amount * self.account.fee_rate  # 或记录实际扣除金额
-            reward -= fee / self.account.balance * 100
         if action == 0 and (self.account.long_position > 0 or self.account.short_position > 0):
             reward += 0.02
         if account_order_res is False:
