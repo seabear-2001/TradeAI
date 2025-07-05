@@ -87,7 +87,7 @@ class TradeAgent:
             model.set_env(env)
         total_timesteps = len(df) * single_step_num
         try:
-            model.learn(total_timesteps=int(total_timesteps), reset_num_timesteps=False, callback=CheckpointCallback(save_freq=eval_freq, save_path=models_backup_path, name_prefix="qrdqn_model"))
+            model.learn(total_timesteps=int(total_timesteps), progress_bar= True, reset_num_timesteps=False, callback=CheckpointCallback(save_freq=eval_freq, save_path=models_backup_path, name_prefix="qrdqn_model"))
         except KeyboardInterrupt:
             print("训练被手动终止，开始保存模型...")
 
