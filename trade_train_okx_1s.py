@@ -11,14 +11,14 @@ num_envs = 20
 
 # 模型保存路径
 eval_path = '/root/autodl-fs/' # /mnt/data/  /root/autodl-fs/
-model_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1m.pt'
-data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1m-features.csv"
+model_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.pt'
+data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
     num_envs = 1
     eval_path = './'
-    model_path = './OKX-BTC-USDT-SWAP-1m.pt'
-    data_path = "./OKX-BTC-USDT-SWAP-1m-features.csv"
+    model_path = './OKX-BTC-USDT-SWAP-1s.pt'
+    data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
 
 # 训练数据集划分比例
