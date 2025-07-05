@@ -42,7 +42,7 @@ eval_freq = 1_000_000
 # }
 model_kwargs = {
     "learning_rate": 1e-4,
-    "buffer_size": 5_000_000,
+    "buffer_size": 50_000_000,
     "learning_starts": 100_000,
     "batch_size": 1024,
     "train_freq": 4,
