@@ -97,7 +97,7 @@ class TradeAgent:
         # )
         total_timesteps = len(df) * single_step_num
         try:
-            model.learn(total_timesteps=int(total_timesteps) , progress_bar=True)
+            model.learn(total_timesteps=int(total_timesteps) ) # , progress_bar=True
         except KeyboardInterrupt:
             print("训练被手动终止，开始保存模型...")
 
