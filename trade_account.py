@@ -40,7 +40,7 @@ class TradeAccount:
         if self.long_position > 0:
             return False
         """按指定数量开多头仓位"""
-        max_position_amount = self.initial_balance / current_price * self.max_position_ratio
+        max_position_amount = self.balance / current_price * self.max_position_ratio
         amount = max_position_amount
         fee = amount * current_price * self.fee_rate
         cost = amount * current_price / self.leverage + fee
@@ -72,7 +72,7 @@ class TradeAccount:
         if self.short_position > 0:
             return False
         """按指定数量开空头仓位"""
-        max_position_amount = self.initial_balance / current_price * self.max_position_ratio
+        max_position_amount = self.balance / current_price * self.max_position_ratio
         amount = max_position_amount
         fee = amount * current_price * self.fee_rate
         cost = amount * current_price / self.leverage + fee

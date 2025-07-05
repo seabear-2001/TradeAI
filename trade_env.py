@@ -11,12 +11,12 @@ class TradeEnv(gymnasium.Env):
 
     def __init__(
             self,
-            live_mode=False,                    # 是否实盘模式
-            df=None,                            # 训练数据，DataFrame 格式
-            tech_indicator_list=None,           # 技术指标列名列表
-            account=None,                       # 交易账户实例
-            account_stop_loss_ratio=0.10,        # 账户整体止损比例
-            account_take_profit_ratio=0.10,      # 账户整体止盈比例
+            live_mode=False,  # 是否实盘模式
+            df=None,  # 训练数据，DataFrame 格式
+            tech_indicator_list=None,  # 技术指标列名列表
+            account=None,  # 交易账户实例
+            account_stop_loss_ratio=0.10,  # 账户整体止损比例
+            account_take_profit_ratio=0.10,  # 账户整体止盈比例
     ):
         super().__init__()
 
@@ -36,7 +36,6 @@ class TradeEnv(gymnasium.Env):
             self.data_array = np.empty((0, len(self.df_fields)), dtype=np.float32)
 
         self.action_space = spaces.Discrete(5)  # 0~4
-
 
         # 状态空间：行情数据 + 账户状态（余额、多空仓位）
         self.observation_space = spaces.Box(
@@ -96,10 +95,15 @@ class TradeEnv(gymnasium.Env):
         elif action == 4:  # 平空档位
             account_order_res = self.account.close_short(current_price)
 
-        if account_order_res is False or account_order_res is None:
-            reward -= 0.02
-        elif account_order_res:
-            reward += 0.02
+        # if account_order_res is False or account_order_res is None:
+        #     reward -= 0.02
+        # elif account_order_res:
+        #     reward += 0.02
+
+        if action in [1, 2, 3, 4] and account_order_res:
+            max_position_amount = self.account.balance / current_price * self.account.max_position_ratio
+            fee = current_price * max_position_amount * self.account.fee_rate  # 或记录实际扣除金额
+            reward -= fee / self.account.balance * 100
 
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
 
@@ -108,9 +112,9 @@ class TradeEnv(gymnasium.Env):
             terminated = True
         elif gain_ratio <= -self.account_stop_loss_ratio:
             terminated = True
+        # reward += gain_ratio
 
-        reward += (net_worth - old_net_worth) / self.account.initial_balance * 100
-
+        reward += (net_worth - old_net_worth) / self.account.balance * 100
 
         # # ✅ 本步收益（只在净值上涨时给予） 净值奖励 避免亏损反弹
         # if net_worth > old_net_worth and net_worth > self.account.initial_balance:
@@ -139,7 +143,7 @@ class TradeEnv(gymnasium.Env):
             'reward': reward,
             'total_reward': self.total_reward
         }
-        if terminated: #or self.total_step-self.last_print_step > 10000
+        if terminated:  # or self.total_step-self.last_print_step > 10000
             print(info)
             # self.last_print_step = self.total_step
         return self._get_observation(), reward, terminated, truncated, info
