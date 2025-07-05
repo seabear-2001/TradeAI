@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import torch
 from sb3_contrib import QRDQN
+from stable_baselines3.common.callbacks import CheckpointCallback
 
 from trade_env import TradeEnv
 
@@ -20,7 +21,6 @@ class TradeAgent:
         gradient_steps = model_kwargs.get("gradient_steps",1)
         if "gradient_steps" in model_kwargs.keys():
             model_kwargs.pop("gradient_steps")
-
         return QRDQN(
             "MlpPolicy",
             env,
@@ -39,7 +39,7 @@ class TradeAgent:
         }, path)
         print(f"[模型已保存至 {path}]")
 
-    def load_model(self, path, env=None, model_kwargs=None, policy_kwargs=None, device="cuda"):
+    def load_model(self, path, env, model_kwargs=None, policy_kwargs=None, device="cuda"):
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None, None
@@ -62,7 +62,6 @@ class TradeAgent:
         path,
         df,
         eval_path = ".",
-        model = None,
         tech_indicator_list=None,
         model_kwargs=None,
         policy_kwargs=None,
@@ -76,6 +75,7 @@ class TradeAgent:
         check_timestamp_consistency(df)
 
         env = make_vec_env(df, tech_indicator_list, num_envs)
+        model, _ = self.load_model(path=path,env=env, device=device)
         print(f"✅ {num_envs}环境并行构建完成")
 
         if model is None:
@@ -85,17 +85,9 @@ class TradeAgent:
         else:
             print(f"[模型 {path}] 继续训练")
             model.set_env(env)
-        # eval_callback = EvalCallback(
-        #     Monitor(TradeEnv(df=df, tech_indicator_list=tech_indicator_list)),  # 用于评估的环境（应是与训练环境相同但无扰动）
-        #     best_model_save_path=f"{eval_path}/models/",
-        #     log_path=f"{eval_path}/eval/",
-        #     eval_freq=eval_freq,  # 每 100 万步评估一次
-        #     deterministic=True,
-        #     render=False
-        # )
         total_timesteps = len(df) * single_step_num
         try:
-            model.learn(total_timesteps=int(total_timesteps))
+            model.learn(total_timesteps=int(total_timesteps), reset_num_timesteps=False, callback=CheckpointCallback(save_freq=eval_freq, save_path=eval_path, name_prefix="qrdqn_model"))
         except KeyboardInterrupt:
             print("训练被手动终止，开始保存模型...")
 
