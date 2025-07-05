@@ -48,7 +48,7 @@ model_kwargs = {
     "train_freq": 4,
     "gradient_steps": 1,
     "target_update_interval": 2000,
-    "exploration_fraction": 0.1,
+    "exploration_fraction": 0.8,
     "exploration_final_eps": 0.02,
     "gamma": 0.95,
 }
