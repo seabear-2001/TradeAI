@@ -2,8 +2,7 @@ import os
 import pandas as pd
 import torch
 from sb3_contrib import QRDQN
-from stable_baselines3.common.callbacks import EvalCallback
-from stable_baselines3.common.monitor import Monitor
+from torch.nn import DataParallel
 
 from trade_env import TradeEnv
 
@@ -13,28 +12,44 @@ class TradeAgent:
         pass
 
     @staticmethod
-    def get_model(model_kwargs=None, policy_kwargs=None, env=None, device="cpu"):
+    def get_model(model_kwargs=None, policy_kwargs=None, env=None, device="cuda"):
         model_kwargs = model_kwargs or {}
         if policy_kwargs:
             model_kwargs['policy_kwargs'] = policy_kwargs
         model_kwargs['device'] = device
         model_kwargs['verbose'] = 1
-        gradient_steps = model_kwargs.get("gradient_steps",1)
-        if "gradient_steps" in model_kwargs.keys():
+
+        gradient_steps = model_kwargs.get("gradient_steps", 1)
+        if "gradient_steps" in model_kwargs:
             model_kwargs.pop("gradient_steps")
 
-        return QRDQN(
+        model = QRDQN(
             "MlpPolicy",
             env,
-            gradient_steps = gradient_steps,
+            gradient_steps=gradient_steps,
             **model_kwargs
         )
+
+        # 如果有多个 GPU，封装 policy
+        if torch.cuda.device_count() > 1:
+            print(f"⚡ 检测到 {torch.cuda.device_count()} 个 GPU，使用 DataParallel")
+            model.policy = DataParallel(model.policy)
+
+        return model
 
     @staticmethod
     def save_model(path, model, last_train_ts):
         os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        # 如果是 DataParallel，需要提取内部模型的 state_dict
+        policy = model.policy
+        if isinstance(policy, torch.nn.DataParallel):
+            policy_state_dict = policy.module.state_dict()
+        else:
+            policy_state_dict = policy.state_dict()
+
         torch.save({
-            'model_state_dict': model.policy.state_dict(),
+            'model_state_dict': policy_state_dict,
             'last_train_ts': last_train_ts,
             'model_kwargs': getattr(model, '_model_kwargs', None),
             'policy_kwargs': getattr(model, '_policy_kwargs', None),
@@ -45,7 +60,7 @@ class TradeAgent:
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None, None
-        model_data = torch.load(path, map_location=device, weights_only= False)
+        model_data = torch.load(path, map_location=device)
 
         if model_kwargs is None:
             model_kwargs = model_data.get('model_kwargs', model_kwargs)
@@ -53,7 +68,13 @@ class TradeAgent:
             policy_kwargs = model_data.get('policy_kwargs', policy_kwargs)
 
         model = self.get_model(model_kwargs, policy_kwargs, env, device)
-        model.policy.load_state_dict(model_data['model_state_dict'])
+
+        # 如果当前使用 DataParallel，加载时也加载到 module
+        if isinstance(model.policy, torch.nn.DataParallel):
+            model.policy.module.load_state_dict(model_data['model_state_dict'])
+        else:
+            model.policy.load_state_dict(model_data['model_state_dict'])
+
         model._model_kwargs = model_kwargs
         model._policy_kwargs = policy_kwargs
         last_train_ts = model_data.get('last_train_ts', 0)
