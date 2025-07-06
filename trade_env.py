@@ -15,8 +15,8 @@ class TradeEnv(gymnasium.Env):
             df=None,  # 训练数据，DataFrame 格式
             tech_indicator_list=None,  # 技术指标列名列表
             account=None,  # 交易账户实例
-            account_stop_loss_ratio=0.01,  # 账户整体止损比例
-            account_take_profit_ratio=0.01,  # 账户整体止盈比例
+            account_stop_loss_ratio=0.10,  # 账户整体止损比例
+            account_take_profit_ratio=0.10,  # 账户整体止盈比例
     ):
         super().__init__()
 
@@ -108,9 +108,12 @@ class TradeEnv(gymnasium.Env):
 
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
-            terminated = True
+            reward += 2.0  # 强烈负奖励惩罚止损
+            self.account.reset()
+
         elif gain_ratio <= -self.account_stop_loss_ratio:
-            terminated = True
+            reward -= 2.0  # 强烈负奖励惩罚止损
+            self.account.reset()
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
