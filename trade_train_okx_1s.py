@@ -11,15 +11,15 @@ num_envs = 20
 
 # 模型保存路径
 models_backup_path = '/root/autodl-fs/' # /mnt/data/  /root/autodl-fs/
-model_load_path = './OKX-BTC-USDT-SWAP-1s.pt'
-model_save_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.pt'
+model_load_path = './root/TradeAI/OKX-BTC-USDT-SWAP-1s.zip'
+model_save_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.zip'
 data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
     num_envs = 1
     models_backup_path = './'
-    model_save_path = './OKX-BTC-USDT-SWAP-1s.pt'
-    data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
+    model_save_path = './OKX-BTC-USDT-SWAP-1s.zip'
+    data_path = "./OKX-BTC-USDT-SWAP-1s-features.zip"
 
 
 # 训练数据集划分比例
