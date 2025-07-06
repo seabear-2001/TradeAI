@@ -2,7 +2,7 @@ import pandas as pd
 import torch
 from trade_agent import TradeAgent, check_timestamp_consistency
 from trade_env import TradeEnv
-from trade_train_okx_1s import all_indicator_names
+from main import all_indicator_names
 
 device = 'cpu'
 
