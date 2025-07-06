@@ -83,8 +83,8 @@ def main():
     agent.train_model(
         model_load_path= model_load_path,
         model_save_path=model_save_path,                    # 模型保存路径
-        df=train_df,                       # 训练数据DataFrame
         models_backup_path=models_backup_path,              # 模型评估数据保存路径
+        df=train_df,                       # 训练数据DataFrame
         eval_freq=eval_freq,              # 模型评估频率
         tech_indicator_list=all_indicator_names,  # 技术指标列表
         single_step_num=single_step_num,  # 每条数据训练多少步
