@@ -4,7 +4,7 @@ from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
-import LSTMFeatureExtractor
+from LSTMFeatureExtractor import LSTMFeatureExtractor
 from trade_env import TradeEnv
 
 
