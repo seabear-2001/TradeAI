@@ -3,7 +3,6 @@ import pandas as pd
 import torch
 from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import CheckpointCallback
-from stable_baselines3.common.utils import get_schedule_fn
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
 from trade_env import TradeEnv
@@ -62,28 +61,33 @@ class TradeAgent:
     @staticmethod
     def save_model(path, model):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        # 直接调用 stable_baselines3 的 save 方法，保存全部状态
         model.save(path)
         print(f"[模型已保存至 {path}]")
 
     @staticmethod
-    def load_model(path, env=None, device="cpu", model_kwargs=None):
+    def load_model(path, env=None, device="cpu", model_kwargs=None, policy_kwargs=None):
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None
-        try:
-            # 用简单恒定函数替换，避免复杂code对象
-            custom_objects = {
-                "lr_schedule": lambda _: model_kwargs.get("learning_rate", 1e-4) if model_kwargs else 1e-4,
-                "exploration_schedule": lambda _: model_kwargs.get("exploration_final_eps",
-                                                                   0.02) if model_kwargs else 0.02,
-            }
-            model = QRDQN.load(path, env=env, device=device, custom_objects=custom_objects)
-            print(f"[模型已加载 {path}]")
-            return model
-        except Exception as e:
-            print(f"加载模型失败: {e}")
-            return None
+
+        model_kwargs = model_kwargs or {}
+        if policy_kwargs:
+            model_kwargs['policy_kwargs'] = policy_kwargs
+        model_kwargs['device'] = device
+        model_kwargs['verbose'] = 1
+
+        # 替换复杂的 schedule 避免警告
+        custom_objects = {
+            "lr_schedule": lambda _: model_kwargs.get("learning_rate", 1e-4),
+            "exploration_schedule": lambda _: model_kwargs.get("exploration_final_eps", 0.02),
+        }
+
+        # 先创建模型实例
+        model = QRDQN("MlpPolicy", env, **model_kwargs)
+        # 再加载权重
+        model = model.load(path, env=env, device=device, custom_objects=custom_objects)
+        print(f"[模型已加载 {path}]")
+        return model
 
     def train_model(
         self,
@@ -106,7 +110,7 @@ class TradeAgent:
         env = make_vec_env(df, tech_indicator_list, num_envs)
         model = None
         if model_load_path:
-            model = self.load_model(path=model_load_path, env=env, device=device)
+            model = self.load_model(path=model_load_path, env=env, device=device, model_kwargs=model_kwargs)
 
         if model is None:
             model = self.get_model(model_kwargs, policy_kwargs, env, device)
@@ -133,4 +137,3 @@ class TradeAgent:
 
         self.save_model(model_save_path, model)
         print(f"[模型 {model_save_path}] 训练完成")
-
