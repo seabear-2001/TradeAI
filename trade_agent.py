@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import torch
 from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv
@@ -65,27 +64,12 @@ class TradeAgent:
         print(f"[模型已保存至 {path}]")
 
     @staticmethod
-    def load_model(path, env=None, device="cpu", model_kwargs=None, policy_kwargs=None):
+    def load_model(path, env=None, device="cpu", custom_objects=None):
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None
 
-        model_kwargs = model_kwargs or {}
-        if policy_kwargs:
-            model_kwargs['policy_kwargs'] = policy_kwargs
-        model_kwargs['device'] = device
-        model_kwargs['verbose'] = 1
-
-        # 替换复杂的 schedule 避免警告
-        custom_objects = {
-            "lr_schedule": lambda _: model_kwargs.get("learning_rate", 1e-4),
-            "exploration_schedule": lambda _: model_kwargs.get("exploration_final_eps", 0.02),
-        }
-
-        # 先创建模型实例
-        model = QRDQN("MlpPolicy", env, **model_kwargs)
-        # 再加载权重
-        model = model.load(path, env=env, device=device, custom_objects=custom_objects)
+        model = QRDQN.load(path, env=env, device=device, custom_objects=custom_objects)
         print(f"[模型已加载 {path}]")
         return model
 
@@ -97,6 +81,7 @@ class TradeAgent:
         models_backup_path=".",
         tech_indicator_list=None,
         model_kwargs=None,
+        custom_objects = None,
         policy_kwargs=None,
         eval_freq=1_000_000,
         single_step_num=3,
@@ -109,8 +94,9 @@ class TradeAgent:
 
         env = make_vec_env(df, tech_indicator_list, num_envs)
         model = None
+
         if model_load_path:
-            model = self.load_model(path=model_load_path, env=env, device=device, model_kwargs=model_kwargs)
+            model = self.load_model(path=model_load_path, env=env, device=device, custom_objects=custom_objects)
 
         if model is None:
             model = self.get_model(model_kwargs, policy_kwargs, env, device)

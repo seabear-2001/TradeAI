@@ -49,6 +49,11 @@ policy_kwargs = dict(
     activation_fn=torch.nn.ReLU
 )
 
+custom_objects = {
+    "lr_schedule": lambda _: 1e-5,
+    "exploration_schedule": lambda _: 0.02,
+}
+
 all_indicator_names = [
     "macd",
     "boll_ub",
@@ -89,6 +94,7 @@ def main():
         tech_indicator_list=all_indicator_names,  # 技术指标列表
         single_step_num=single_step_num,  # 每条数据训练多少步
         model_kwargs=model_kwargs,         # QRDQN超参数
+        custom_objects=custom_objects,
         policy_kwargs=policy_kwargs,       # 策略网络参数
         device=device,                    # 设备
         num_envs=num_envs,
