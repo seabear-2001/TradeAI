@@ -124,8 +124,8 @@ class TradeEnv(gymnasium.Env):
             account_order_res = self.account.close_short()
 
         # 持仓时空动作小奖励，鼓励持仓操作
-        if action == 0 and (self.account.long_position > 0 or self.account.short_position > 0):
-            reward += 0.02
+        # if action == 0 and (self.account.long_position > 0 or self.account.short_position > 0):
+        #     reward += 0.02
 
         # 无效动作惩罚
         if account_order_res is False:
