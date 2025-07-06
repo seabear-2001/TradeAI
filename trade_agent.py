@@ -3,6 +3,7 @@ import pandas as pd
 import torch
 from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import CheckpointCallback
+from stable_baselines3.common.utils import get_schedule_fn
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
 from trade_env import TradeEnv
@@ -66,18 +67,24 @@ class TradeAgent:
         print(f"[模型已保存至 {path}]")
 
     @staticmethod
-    def load_model(path, env=None, device="cpu"):
+    def load_model(path, env=None, device="cpu", model_kwargs=None):
         if not os.path.exists(path):
             print(f"模型文件不存在: {path}")
             return None
         try:
-            model = QRDQN.load(path, env=env, device=device)
+            # 准备替换调度器，避免警告
+            custom_objects = {}
+            if model_kwargs is not None:
+                custom_objects = {
+                    "lr_schedule": get_schedule_fn(model_kwargs.get("learning_rate", 1e-4)),
+                    "exploration_schedule": get_schedule_fn(model_kwargs.get("exploration_final_eps", 0.02)),
+                }
+            model = QRDQN.load(path, env=env, device=device, custom_objects=custom_objects)
             print(f"[模型已加载 {path}]")
             return model
         except Exception as e:
             print(f"加载模型失败: {e}")
             return None
-
     def train_model(
         self,
         model_save_path,
