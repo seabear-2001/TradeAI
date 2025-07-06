@@ -48,7 +48,10 @@ policy_kwargs = dict(
     net_arch=[512, 512, 256, 128],
     activation_fn=torch.nn.ReLU,
     features_extractor_kwargs = dict(
-            lstm_hidden_size=64
+            seq_len=60,            # 输入的时间序列长度
+            d_model=64,            # Transformer隐藏维度
+            nhead=4,               # 注意力头数
+            num_layers=2           # 编码器层数
     )
 )
 

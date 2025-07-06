@@ -9,10 +9,10 @@ class TradeEnv(gymnasium.Env):
 
     def __init__(
             self,
+            lstm_seq_len,  # 序列长度，LSTM 输入需要
             df=None,  # 训练数据 DataFrame
             tech_indicator_list=None,  # 技术指标列名列表
             account=None,  # 账户对象实例
-            lstm_seq_len=60,  # 序列长度，LSTM 输入需要
     ):
         super().__init__()
 

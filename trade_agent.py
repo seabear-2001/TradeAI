@@ -3,8 +3,9 @@ import pandas as pd
 from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv
+from gymnasium.wrappers import FlattenObservation
 
-from LSTMFeatureExtractor import LSTMFeatureExtractor
+from TransformerFeatureExtractor import TransformerFeatureExtractor
 from trade_env import TradeEnv
 
 
@@ -24,14 +25,16 @@ def check_timestamp_consistency(df: pd.DataFrame, time_col: str = 'timestamp') -
     print("✅ 时间戳连贯，间隔一致")
 
 
-def make_single_env(df, tech_indicator_list):
+def make_single_env(df, tech_indicator_list, seq_len):
     def _init():
-        return TradeEnv(df=df.copy(), tech_indicator_list=tech_indicator_list)
+        env = TradeEnv(df=df.copy(), tech_indicator_list=tech_indicator_list, lstm_seq_len=seq_len)
+        env = FlattenObservation(env)  # ✅ 扁平化 obs，供 TransformerFeatureExtractor 使用
+        return env
     return _init
 
 
-def make_vec_env(df, tech_indicator_list, num_envs):
-    env_fns = [make_single_env(df, tech_indicator_list) for _ in range(num_envs)]
+def make_vec_env(df, tech_indicator_list, num_envs, seq_len):
+    env_fns = [make_single_env(df, tech_indicator_list, seq_len) for _ in range(num_envs)]
     return SubprocVecEnv(env_fns)
 
 
@@ -42,19 +45,26 @@ class TradeAgent:
     @staticmethod
     def get_model(model_kwargs=None, policy_kwargs=None, env=None, device="cpu"):
         model_kwargs = model_kwargs or {}
+        policy_kwargs = policy_kwargs or {}
 
-        # ✅ 设置 LSTM 为特征提取器
-        if policy_kwargs is None:
-            policy_kwargs = {}
-        policy_kwargs['features_extractor_class'] = LSTMFeatureExtractor
-        policy_kwargs['features_extractor_kwargs'] = dict(
-            lstm_hidden_size=64
-        ) if policy_kwargs['features_extractor_kwargs'] is None else policy_kwargs['features_extractor_kwargs']
+        # ✅ 默认设置 Transformer 作为特征提取器
+        policy_kwargs['features_extractor_class'] = TransformerFeatureExtractor
+
+        # ✅ 设置默认 Transformer 参数
+        if 'features_extractor_kwargs' not in policy_kwargs or policy_kwargs['features_extractor_kwargs'] is None:
+            policy_kwargs['features_extractor_kwargs'] = dict(
+                seq_len=60,
+                feature_dim=20,
+                d_model=64,
+                nhead=4,
+                num_layers=2
+            )
 
         model_kwargs['policy_kwargs'] = policy_kwargs
         model_kwargs['device'] = device
         model_kwargs['verbose'] = 1
 
+        # 避免重复传入 gradient_steps
         gradient_steps = model_kwargs.pop("gradient_steps", 1)
 
         model = QRDQN(
@@ -100,16 +110,23 @@ class TradeAgent:
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         check_timestamp_consistency(df)
 
+        # 获取序列长度，用于环境初始化
+        seq_len = 60
+        if policy_kwargs and 'features_extractor_kwargs' in policy_kwargs:
+            seq_len = policy_kwargs['features_extractor_kwargs'].get('seq_len', 60)
+            policy_kwargs['features_extractor_kwargs']['feature_dim'] = len(tech_indicator_list) + 5
+
+
         print(f"\n=== 开始全量训练，共 {len(df)} 条数据 ===")
 
-        env = make_vec_env(df, tech_indicator_list, num_envs)
+        env = make_vec_env(df, tech_indicator_list, num_envs, seq_len)
         model = None
 
         if model_load_path is not None:
             print(f"加载已有模型 {model_load_path} 进行增量训练")
             model = self.load_model(path=model_load_path, env=env, device=device, custom_objects=custom_objects)
         if model is None:
-            print(f"模型加载失败，重新创建新模型")
+            print(f"模型加载失败或未提供，创建新模型")
             model = self.get_model(model_kwargs, policy_kwargs, env, device)
 
         model.set_env(env)
@@ -126,5 +143,6 @@ class TradeAgent:
                 name_prefix="qrdqn_model"
             )
         )
+
         self.save_model(model_save_path, model)
-        print(f"✅ 全量训练完成，模型保存至 {model_save_path}")
+        print(f"✅ 训练完成，模型保存至 {model_save_path}")
