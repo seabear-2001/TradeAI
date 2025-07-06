@@ -4,7 +4,7 @@ from trade_agent import TradeAgent, check_timestamp_consistency
 from trade_env import TradeEnv
 from trade_train_okx_1s import all_indicator_names
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
 
 model_path = './OKX-BTC-USDT-SWAP-1s.zip'
 data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"

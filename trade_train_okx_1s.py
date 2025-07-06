@@ -86,7 +86,7 @@ def main():
     # 实例化交易代理
     agent = TradeAgent()
     agent.train_model(
-        model_load_path= model_load_path,
+        # model_load_path= model_load_path,
         model_save_path=model_save_path,                    # 模型保存路径
         models_backup_path=models_backup_path,              # 模型评估数据保存路径
         df=train_df,                       # 训练数据DataFrame
