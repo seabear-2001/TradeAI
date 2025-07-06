@@ -168,6 +168,7 @@ class TradeEnv(gymnasium.Env):
         if terminated or account_reset:
             print(f"终止信息: {info}")
             self.account.reset()
+            self.total_reward = 0
 
         # 返回 (下一个状态序列, reward, terminated, truncated=False, info)
         return self._get_observation(), reward, terminated, False, info
