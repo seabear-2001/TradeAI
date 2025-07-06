@@ -11,13 +11,14 @@ num_envs = 10
 
 # 模型保存路径
 models_backup_path = '/root/autodl-fs/' # /mnt/data/  /root/autodl-fs/
-model_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.pt'
+model_load_path = './OKX-BTC-USDT-SWAP-1s.pt'
+model_save_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.pt'
 data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
 if system_name == "Windows":
     num_envs = 1
     models_backup_path = './'
-    model_path = './OKX-BTC-USDT-SWAP-1s.pt'
+    model_save_path = './OKX-BTC-USDT-SWAP-1s.pt'
     data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
 
@@ -31,7 +32,7 @@ eval_freq = 1_000_000
 model_kwargs = {
     "learning_rate": 1e-5,            # 学习率，越小越稳定
     "buffer_size": 50_000_000,           # 经验回放池大小，越大越稳定但占内存
-    "learning_starts": 0,        # 收集多少步后开始训练 1_500_000
+    "learning_starts": 1_500_000,        # 收集多少步后开始训练 1_500_000
     "batch_size": 4096,                # 每次训练采样大小
     "train_freq": 1,                  # 每执行多少步训练一次模型 和 每次训练的更新步数
     "gradient_steps": 4,              # 每次训练的更新步数
@@ -79,7 +80,8 @@ def main():
     # 实例化交易代理
     agent = TradeAgent()
     agent.train_model(
-        model_path=model_path,                    # 模型保存路径
+        model_load_path= model_load_path,
+        model_save_path=model_save_path,                    # 模型保存路径
         df=train_df,                       # 训练数据DataFrame
         models_backup_path=models_backup_path,              # 模型评估数据保存路径
         eval_freq=eval_freq,              # 模型评估频率
