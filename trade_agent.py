@@ -4,6 +4,7 @@ from sb3_contrib import QRDQN
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.vec_env import SubprocVecEnv
 
+import LSTMFeatureExtractor
 from trade_env import TradeEnv
 
 
@@ -41,12 +42,19 @@ class TradeAgent:
     @staticmethod
     def get_model(model_kwargs=None, policy_kwargs=None, env=None, device="cpu"):
         model_kwargs = model_kwargs or {}
-        if policy_kwargs:
-            model_kwargs['policy_kwargs'] = policy_kwargs
+
+        # ✅ 设置 LSTM 为特征提取器
+        if policy_kwargs is None:
+            policy_kwargs = {}
+        policy_kwargs['features_extractor_class'] = LSTMFeatureExtractor
+        policy_kwargs['features_extractor_kwargs'] = dict(
+            lstm_hidden_size=64
+        )
+
+        model_kwargs['policy_kwargs'] = policy_kwargs
         model_kwargs['device'] = device
         model_kwargs['verbose'] = 1
 
-        # 提取 gradient_steps 参数，避免冲突
         gradient_steps = model_kwargs.pop("gradient_steps", 1)
 
         model = QRDQN(
