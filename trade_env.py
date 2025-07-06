@@ -12,11 +12,11 @@ class TradeEnv(gymnasium.Env):
             df=None,  # 训练数据 DataFrame
             tech_indicator_list=None,  # 技术指标列名列表
             account=None,  # 账户对象实例
-            seq_len=60,  # 序列长度，LSTM 输入需要
+            lstm_seq_len=60,  # 序列长度，LSTM 输入需要
     ):
         super().__init__()
 
-        self.seq_len = seq_len
+        self.lstm_seq_len = lstm_seq_len
 
         # 初始化账户，如果无则创建默认账户
         self.account = account if account is not None else TradeAccount()
@@ -40,12 +40,12 @@ class TradeEnv(gymnasium.Env):
         self.observation_space = spaces.Box(
             low=-np.inf,
             high=np.inf,
-            shape=(self.seq_len, len(self.df_fields) + account_state_dim),
+            shape=(self.lstm_seq_len, len(self.df_fields) + account_state_dim),
             dtype=np.float32
         )
 
         # 初始化环境状态计数器
-        self.current_step = self.seq_len - 1  # 从 seq_len-1 开始，确保有完整序列
+        self.current_step = self.lstm_seq_len - 1  # 从 seq_len-1 开始，确保有完整序列
         self.total_reward = 0
         self.total_step = 0
 
@@ -60,11 +60,11 @@ class TradeEnv(gymnasium.Env):
         self.total_step = 0
 
         # 起始步数重置为 seq_len-1，保证初始状态序列完整
-        self.current_step = self.seq_len - 1
+        self.current_step = self.lstm_seq_len - 1
 
         # 检查数据是否足够
-        assert len(self.data_array) >= self.seq_len, \
-            f"数据长度不足 seq_len={self.seq_len}，当前长度={len(self.data_array)}"
+        assert len(self.data_array) >= self.lstm_seq_len, \
+            f"数据长度不足 seq_len={self.lstm_seq_len}，当前长度={len(self.data_array)}"
 
         return self._get_observation(), {}
 
@@ -78,7 +78,7 @@ class TradeEnv(gymnasium.Env):
             return np.zeros(self.observation_space.shape, dtype=np.float32)
 
         # 计算序列起止索引
-        start_idx = self.current_step - self.seq_len + 1
+        start_idx = self.current_step - self.lstm_seq_len + 1
         end_idx = self.current_step + 1
 
         obs_seq = []
