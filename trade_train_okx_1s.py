@@ -11,7 +11,7 @@ num_envs = 20
 
 # 模型保存路径
 models_backup_path = '/root/autodl-fs/' # /mnt/data/  /root/autodl-fs/
-model_load_path = './root/TradeAI/OKX-BTC-USDT-SWAP-1s.zip'
+model_load_path = '/root/TradeAI/OKX-BTC-USDT-SWAP-1s.zip'
 model_save_path = '/root/autodl-fs/OKX-BTC-USDT-SWAP-1s.zip'
 data_path = "/root/autodl-fs/OKX-BTC-USDT-SWAP-1s-features.csv"
 system_name = platform.system()
