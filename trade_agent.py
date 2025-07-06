@@ -111,11 +111,10 @@ class TradeAgent:
         check_timestamp_consistency(df)
 
         # 获取序列长度，用于环境初始化
-        seq_len = 60
-        if policy_kwargs and 'features_extractor_kwargs' in policy_kwargs:
-            seq_len = policy_kwargs['features_extractor_kwargs'].get('seq_len', 60)
-            policy_kwargs['features_extractor_kwargs']['feature_dim'] = len(tech_indicator_list) + 5
-
+        fe_kwargs = policy_kwargs.get('features_extractor_kwargs', {})
+        fe_kwargs['feature_dim'] = len(tech_indicator_list) + 5
+        policy_kwargs['features_extractor_kwargs'] = fe_kwargs
+        seq_len = fe_kwargs.get('seq_len', 60)
 
         print(f"\n=== 开始全量训练，共 {len(df)} 条数据 ===")
 
