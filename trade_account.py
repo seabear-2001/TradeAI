@@ -9,36 +9,45 @@ class TradeAccount:
             initial_balance=1000000,         # 初始账户资金
             leverage=100,                    # 杠杆倍数，用于计算保证金
             fee_rate=0.0005,                  # 交易手续费率
-            max_position_ratio= 0.1
+            max_position_ratio= 0.1,  #
     ):
         # 账户参数
         self.initial_balance = initial_balance
         self.leverage = leverage
         self.fee_rate = fee_rate
+        self.max_position_ratio = max_position_ratio
 
         # 账户状态
         self.balance = initial_balance  # 当前余额
         self.net_worth = initial_balance  # 当前净值
+        self.old_net_worth = initial_balance
         self.max_net_worth = initial_balance  # 历史最大净值
-        self.max_position_ratio = max_position_ratio
         self.long_position = 0.0  # 多头持仓量
         self.long_ave_price = 0.0  # 多头平均持仓价
         self.short_position = 0.0  # 空头持仓量
         self.short_ave_price = 0.0  # 空头平均持仓价
-
+        self.current_price = None
     def reset(self):
         """重置账户状态到初始值"""
         self.balance = self.initial_balance
         self.net_worth = self.initial_balance
+        self.old_net_worth = self.initial_balance
         self.max_net_worth = self.initial_balance
         self.long_position = 0.0
         self.long_ave_price = 0.0
         self.short_position = 0.0
         self.short_ave_price = 0.0
+        self.current_price = None
 
-    def open_long(self, current_price):
+    def set_price(self, current_price):
+        self.current_price =current_price
+        self.update_net_worth()
+
+    def open_long(self):
         if self.long_position > 0:
             return False
+
+        current_price = self.current_price
         """按指定数量开多头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
         amount = max_position_amount
@@ -52,10 +61,11 @@ class TradeAccount:
             return fee
         return False
 
-    def close_long(self, current_price):
+    def close_long(self):
         """按指定数量平多头仓位"""
         if self.long_position <= 0:
             return False
+        current_price = self.current_price
 
         actual_amount = self.long_position
         fee = actual_amount * current_price * self.fee_rate
@@ -68,9 +78,10 @@ class TradeAccount:
             self.long_ave_price = 0.0
         return profit
 
-    def open_short(self, current_price):
+    def open_short(self):
         if self.short_position > 0:
             return False
+        current_price = self.current_price
         """按指定数量开空头仓位"""
         max_position_amount = self.initial_balance / current_price * self.max_position_ratio
         amount = max_position_amount
@@ -84,10 +95,11 @@ class TradeAccount:
             return fee
         return False
 
-    def close_short(self, current_price):
+    def close_short(self):
         """按指定数量平空头仓位"""
         if self.short_position <= 0:
             return False
+        current_price = self.current_price
 
         actual_amount = self.short_position
         fee = actual_amount * current_price * self.fee_rate
@@ -101,14 +113,15 @@ class TradeAccount:
         return profit
 
 
-    def update_net_worth(self, current_price):
+    def update_net_worth(self):
+        current_price = self.current_price
         """更新账户净值"""
-        old_net_worth = self.net_worth
+        self.old_net_worth = self.net_worth
         self.net_worth = self.balance + \
                          self.long_position * (current_price - self.long_ave_price) + \
                          self.short_position * (self.short_ave_price - current_price)
         self.max_net_worth = max(self.max_net_worth, self.net_worth)
-        return self.net_worth, old_net_worth, self.max_net_worth
+
 
     def get_account_state(self):
         """获取账户状态用于观察空间"""

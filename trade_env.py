@@ -11,17 +11,13 @@ class TradeEnv(gymnasium.Env):
 
     def __init__(
             self,
-            live_mode=False,  # 是否实盘模式
             df=None,  # 训练数据，DataFrame 格式
             tech_indicator_list=None,  # 技术指标列名列表
             account=None,  # 交易账户实例
-            account_stop_loss_ratio=0.10,  # 账户整体止损比例
-            account_take_profit_ratio=0.10,  # 账户整体止盈比例
     ):
         super().__init__()
 
         # 参数记录
-        self.live_mode = live_mode
         self.account_stop_loss_ratio = account_stop_loss_ratio
         self.account_take_profit_ratio = account_take_profit_ratio
 
@@ -55,16 +51,8 @@ class TradeEnv(gymnasium.Env):
         self.current_step = 0
         self.total_reward = 0
         # 实盘模式数据传入
-        if self.live_mode:
-            if initial_data is not None:
-                # 只保留数值列，避免包含时间戳字符串导致转换失败
-                numeric_df = initial_data[self.df_fields].copy()
-                self.data_array = numeric_df.values.astype(np.float32)
-            else:
-                self.data_array = np.empty((0, len(self.df_fields)), dtype=np.float32)
-        else:
-            self.account.reset()
-            assert self.data_array is not None and len(self.data_array) > 0, "训练模式必须提供数据"
+        self.account.reset()
+        assert self.data_array is not None and len(self.data_array) > 0, "训练模式必须提供数据"
 
         return self._get_observation(), {}
 
@@ -78,6 +66,7 @@ class TradeEnv(gymnasium.Env):
 
     def step(self, action):
         current_price = self.data_array[self.current_step][3]
+        self.account.set_price(current_price)
 
         reward = 0.0
         terminated = False
@@ -87,38 +76,37 @@ class TradeEnv(gymnasium.Env):
             if self.account.long_position <= 0 and self.account.short_position <= 0:
                 account_order_res = False
         elif action == 1:  # 开多档位
-            account_order_res = self.account.open_long(current_price)
+            account_order_res = self.account.open_long()
         elif action == 2:  # 平多档位
-            account_order_res = self.account.close_long(current_price)
+            account_order_res = self.account.close_long()
         elif action == 3:  # 开空档位
-            account_order_res = self.account.open_short(current_price)
+            account_order_res = self.account.open_short()
         elif action == 4:  # 平空档位
-            account_order_res = self.account.close_short(current_price)
+            account_order_res = self.account.close_short()
 
         if action == 0 and (self.account.long_position > 0 or self.account.short_position > 0):
             reward += 0.02
         if account_order_res is False:
             reward -= 0.02
+
         # 平仓时，若成功，奖励真实盈利
         if action in [2, 4] and account_order_res:
             reward += account_order_res / self.account.balance * 100  # 归一化收益
 
-        net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
-        reward += (net_worth - old_net_worth) / self.account.balance * 100
+        reward += (self.account.net_worth - self.account.old_net_worth) / self.account.balance * 100
 
         gain_ratio = self.account.get_gain_ratio()
-        if gain_ratio >= self.account_take_profit_ratio:
+
+        if gain_ratio >= 0.1:
             reward += 2.0
             account_reset = True
 
-        elif gain_ratio <= -self.account_stop_loss_ratio:
+        elif gain_ratio <= -0.1:
             reward -= 2.0
             account_reset = True
 
-        if not self.live_mode and self.current_step >= len(self.data_array) - 1:
+        if self.current_step >= len(self.data_array) - 1:
             terminated = True
-
-        truncated = False
 
         self.total_reward += reward
         self.current_step += 1
@@ -135,7 +123,7 @@ class TradeEnv(gymnasium.Env):
             print(info)
             self.account.reset()
             # self.last_print_step = self.total_step
-        return self._get_observation(), reward, terminated, truncated, info
+        return self._get_observation(), reward, terminated, False, info
 
     def render(self):
         """渲染当前环境状态"""
