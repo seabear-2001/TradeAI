@@ -131,9 +131,9 @@ class TradeEnv(gymnasium.Env):
             'reward': reward,
             'total_reward': self.total_reward
         }
-        if terminated:  # or self.total_step-self.last_print_step > 10000
+        if terminated or self.total_step-self.last_print_step > 10000:
             print(info)
-            # self.last_print_step = self.total_step
+            self.last_print_step = self.total_step
         return self._get_observation(), reward, terminated, truncated, info
 
     def render(self):

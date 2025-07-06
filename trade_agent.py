@@ -123,19 +123,16 @@ class TradeAgent:
 
             total_timesteps = len(chunk_df) * single_step_num
 
-            try:
-                model.learn(
-                    total_timesteps=int(total_timesteps),
-                    progress_bar=True,
-                    reset_num_timesteps=False,
-                    callback=CheckpointCallback(
-                        save_freq=eval_freq,
-                        save_path=models_backup_path,
-                        name_prefix=f"qrdqn_model_chunk{i+1}"
-                    )
+            model.learn(
+                total_timesteps=int(total_timesteps),
+                progress_bar=True,
+                reset_num_timesteps=False,
+                callback=CheckpointCallback(
+                    save_freq=eval_freq,
+                    save_path=models_backup_path,
+                    name_prefix=f"qrdqn_model_chunk{i+1}"
                 )
-            except KeyboardInterrupt:
-                print("训练被手动终止，开始保存模型...")
+            )
 
             # 保存当前段训练后的模型
             save_path = f"{os.path.splitext(model_save_path)[0]}_chunk{i+1}{os.path.splitext(model_save_path)[1]}"
