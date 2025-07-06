@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 class TransformerFeatureExtractor(nn.Module):
-    def __init__(self, seq_len=60, feature_dim=24, d_model=64, nhead=4, num_layers=2):
+    def __init__(self, observation_space, seq_len=60, feature_dim=24, d_model=64, nhead=4, num_layers=2):
         super().__init__()
         self.seq_len = seq_len
         self.feature_dim = feature_dim
