@@ -48,7 +48,7 @@ policy_kwargs = dict(
     net_arch=[512, 512, 256, 128],
     activation_fn=torch.nn.ReLU,
     features_extractor_kwargs = dict(
-            lstm_hidden_size=128
+            lstm_hidden_size=64
     )
 )
 
