@@ -110,20 +110,33 @@ class TradeAgent:
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         check_timestamp_consistency(df)
 
-        # 获取序列长度，用于环境初始化
-        fe_kwargs = policy_kwargs.get('features_extractor_kwargs', {})
-        fe_kwargs['feature_dim'] = len(tech_indicator_list) + 5
+        # 序列长度，用于环境初始化和Transformer
+        seq_len = 60
+        if policy_kwargs is None:
+            policy_kwargs = {}
+
+        # 先创建环境
+        env = make_vec_env(df, tech_indicator_list, num_envs, seq_len)
+
+        # 自动根据环境 observation_space 计算 feature_dim
+        obs_shape = env.observation_space.shape  # (obs_dim,)
+        calculated_feature_dim = obs_shape[0] // seq_len
+        print(f"环境 observation_space.shape: {obs_shape}，自动计算 feature_dim={calculated_feature_dim}")
+
+        # 设置或更新 features_extractor_kwargs 中的 feature_dim 和 seq_len
+        fe_kwargs = policy_kwargs.get('features_extractor_kwargs', {}) or {}
+        fe_kwargs['seq_len'] = seq_len
+        fe_kwargs['feature_dim'] = calculated_feature_dim
         policy_kwargs['features_extractor_kwargs'] = fe_kwargs
-        seq_len = fe_kwargs.get('seq_len', 60)
 
         print(f"\n=== 开始全量训练，共 {len(df)} 条数据 ===")
 
-        env = make_vec_env(df, tech_indicator_list, num_envs, seq_len)
         model = None
 
         if model_load_path is not None:
             print(f"加载已有模型 {model_load_path} 进行增量训练")
             model = self.load_model(path=model_load_path, env=env, device=device, custom_objects=custom_objects)
+
         if model is None:
             print(f"模型加载失败或未提供，创建新模型")
             model = self.get_model(model_kwargs, policy_kwargs, env, device)
