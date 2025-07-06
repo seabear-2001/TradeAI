@@ -18,8 +18,9 @@ system_name = platform.system()
 if system_name == "Windows":
     num_envs = 1
     models_backup_path = './'
-    model_save_path = './OKX-BTC-USDT-SWAP-1s.zip'
-    data_path = "./OKX-BTC-USDT-SWAP-1s-features.zip"
+    model_load_path = './OKX-BTC-USDT-SWAP-1s.zip'
+    model_save_path = './OKX-BTC-USDT-SWAP-1s_1.zip'
+    data_path = "./OKX-BTC-USDT-SWAP-1s-features.csv"
 
 
 # 训练数据集划分比例
