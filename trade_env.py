@@ -99,6 +99,9 @@ class TradeEnv(gymnasium.Env):
             reward += 0.02
         if account_order_res is False:
             reward -= 0.02
+        # 平仓时，若成功，奖励真实盈利
+        if action in [2, 4] and account_order_res:
+            reward += account_order_res / self.account.balance * 100  # 归一化收益
 
         net_worth, old_net_worth, max_net_worth = self.account.update_net_worth(current_price)
         reward += (net_worth - old_net_worth) / self.account.balance * 100

@@ -49,7 +49,7 @@ class TradeAccount:
             self.long_position += amount
             self.long_ave_price = total_cost / self.long_position
             self.balance -= cost
-            return True
+            return fee
         return False
 
     def close_long(self, current_price):
@@ -66,7 +66,7 @@ class TradeAccount:
         self.long_position -= actual_amount
         if self.long_position < 0:
             self.long_ave_price = 0.0
-        return True
+        return profit
 
     def open_short(self, current_price):
         if self.short_position > 0:
@@ -81,7 +81,7 @@ class TradeAccount:
             self.short_position += amount
             self.short_ave_price = total_cost / self.short_position
             self.balance -= cost
-            return True
+            return fee
         return False
 
     def close_short(self, current_price):
@@ -98,7 +98,7 @@ class TradeAccount:
         self.short_position -= actual_amount
         if self.short_position < 0:
             self.short_ave_price = 0.0
-        return True
+        return profit
 
 
     def update_net_worth(self, current_price):
