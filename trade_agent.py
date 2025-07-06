@@ -72,19 +72,19 @@ class TradeAgent:
             print(f"模型文件不存在: {path}")
             return None
         try:
-            # 准备替换调度器，避免警告
-            custom_objects = {}
-            if model_kwargs is not None:
-                custom_objects = {
-                    "lr_schedule": get_schedule_fn(model_kwargs.get("learning_rate", 1e-4)),
-                    "exploration_schedule": get_schedule_fn(model_kwargs.get("exploration_final_eps", 0.02)),
-                }
+            # 用简单恒定函数替换，避免复杂code对象
+            custom_objects = {
+                "lr_schedule": lambda _: model_kwargs.get("learning_rate", 1e-4) if model_kwargs else 1e-4,
+                "exploration_schedule": lambda _: model_kwargs.get("exploration_final_eps",
+                                                                   0.02) if model_kwargs else 0.02,
+            }
             model = QRDQN.load(path, env=env, device=device, custom_objects=custom_objects)
             print(f"[模型已加载 {path}]")
             return model
         except Exception as e:
             print(f"加载模型失败: {e}")
             return None
+
     def train_model(
         self,
         model_save_path,
