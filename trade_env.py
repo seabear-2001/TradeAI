@@ -82,7 +82,7 @@ class TradeEnv(gymnasium.Env):
         reward = 0.0
         terminated = False
         account_order_res = None
-        account_stop_loss = None
+        account_reset = False
         if action == 0:
             if self.account.long_position <= 0 and self.account.short_position <= 0:
                 account_order_res = False
@@ -109,13 +109,11 @@ class TradeEnv(gymnasium.Env):
         gain_ratio = self.account.get_gain_ratio()
         if gain_ratio >= self.account_take_profit_ratio:
             reward += 2.0
-            self.account.reset()
-            account_stop_loss = False
+            account_reset = True
 
         elif gain_ratio <= -self.account_stop_loss_ratio:
             reward -= 2.0
-            self.account.reset()
-            account_stop_loss = True
+            account_reset = True
 
         if not self.live_mode and self.current_step >= len(self.data_array) - 1:
             terminated = True
@@ -133,8 +131,9 @@ class TradeEnv(gymnasium.Env):
             'reward': reward,
             'total_reward': self.total_reward
         }
-        if terminated or account_stop_loss is not None:
+        if terminated or account_reset:
             print(info)
+            self.account.reset()
             # self.last_print_step = self.total_step
         return self._get_observation(), reward, terminated, truncated, info
 
